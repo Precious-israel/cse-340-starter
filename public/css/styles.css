@@ -23,7 +23,7 @@ h1 {
 #wrapper {
   min-height: 90vh;
   background-color: #fff;
-  margin: 5% 12%;     /* 5% top/bottom, 15% left/right */
+  margin: 2% 10%;     
   padding: 20px;
   border: 5px solid deepskyblue;
   border-radius: 5px;
@@ -114,12 +114,12 @@ body {
     position: absolute;
     top: 10%;
     left: 5%;
-    background-color: rgba(255, 255, 255, 0.85); /* Slightly more opaque for readability */
-    color: deepskyblue;
+    background-color: rgba(255, 255, 255, 0.85); 
+    color: darkblue;
     font-weight: 800;
     padding: 30px;
     border-radius: 15px;
-    max-width: 400px;
+    max-width: 300px;
     font-size: 20px;
     line-height: 1.6;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -147,7 +147,7 @@ body {
 
 .own-button:hover {
     background-color: skyblue;
-    color: white;
+    color: black;
 }
 
 /* Container for upgrades and reviews */
@@ -168,8 +168,9 @@ body {
 
 /* Section Heading */
  h3 {
-    margin-bottom: 15px;
-    font-size: 1.5rem;
+    margin-bottom: 45px;
+    font-size: 2.5rem;
+    font-weight: bold;
 }
 
 /* Grid layout: 2 columns */
@@ -185,9 +186,9 @@ body {
     flex-direction: column;
     align-items: center;
     background-color: #007BFF;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 20px; /* Space for caption */
+    padding: 8px;
+    margin-top: 15px;
+    margin-bottom: 18px; /* Space for caption */
     position: relative;
     height: 160px;
     overflow: visible;
@@ -195,21 +196,21 @@ body {
 
 /* Image inside figure */
 .upgrade-box img {
-  width: 90%;               /* Increased from 80% */
-  height: 90%;              /* Fill more vertical space */
-  object-fit: contain;      /* Preserve aspect ratio */
+  width: 95%;               
+  height: 100%;             
+  object-fit: contain;      
   display: block;
-  margin: auto;             /* Center horizontally */
+  margin: auto;             
 }
 
 
 /* Caption placed outside the box */
 .upgrade-figure figcaption {
   margin-top: 10px;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: bold;
   text-decoration: underline;
-  color: #333;
+  color: darkblue;
   text-align: center;
 }
 
@@ -244,10 +245,9 @@ body {
 }
 
 .reviews li {
-  font-size: 1.8rem;
-  line-height: 1.6;
+  font-size: 1.7rem;
+  line-height: 1.5;
 }
-
 
 
 /* Footer separation */
@@ -256,55 +256,78 @@ footer {
     padding: 20px;
     text-align: left;
     color: black;
+    font-weight: bold;
+    font-size: large;
 }
 
+/* media query for small screen at 680px*/
 
+@media (max-width: 680px) {
+    #wrapper {
+        margin: 5% 5%;
+        padding: 15px;
+    }
 
-        /* Media Query for screens below 680px */
-        @media (max-width: 680px) {
-            #wrapper {
-                margin: 5% 5%; /* Reduce side margins on small screens */
-                padding: 15px;
-            }
-            
-            #top-header {
-                flex-direction: column; /* Stack header items vertically */
-                align-items: center;
-                gap: 10px;
-            }
-            
-            .nav-menu {
-                flex-direction: column; /* Stack navigation items */
-                align-items: center;
-                gap: 10px;
-                padding: 10px 0;
-            }
-            
-            .main-main-container {
-                flex-direction: column;
-                align-items: center;
-                margin: 20px auto;
-                width: 95%;
-            }
+    /* ✅ Keep header and nav horizontal */
+    #top-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
 
-            
-            .features-section {
-                flex-direction: column; /* Stack upgrades and reviews */
-            }
-            
-            .upgrades-grid {
-                grid-template-columns: 2fr; 
-            }
-            
-            .car-info, .reviews, .upgrades {
-                max-width: 100%; 
-            }
-            
-            .car-image img {
-                width: 100%; 
-            }
-            
-            footer {
-                text-align: left; 
-            }
-        }
+    .nav-menu {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 0;
+    }
+
+    /* ✅ Maintain car layout like large screen */
+    .main-main-container {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .car-image img {
+        width: 100%;
+    }
+
+    .car-info {
+        width: 50%;
+        left: 5%;
+        font-size: 18px;
+        padding: 10px;
+    }
+
+    /* ✅ Stack reviews above upgrades */
+    .features-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 40px;
+    }
+
+    .reviews {
+        order: 1;
+        width: 100%;
+        margin-bottom: 10px;
+        margin-top: 20px;
+    }
+
+    .upgrades {
+        order: 2;
+        width: 100%;
+    }
+
+    .upgrades-grid {
+        grid-template-columns: 1fr 1fr;  /* 2 items per row */
+        gap: 20px;
+    }
+
+    footer {
+        text-align: left;
+    }
+}
