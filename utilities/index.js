@@ -4,8 +4,7 @@ const Util = {}
 /* ************************
  * Constructs the nav HTML unordered list
  ************************** */
-Util.getNav = async function (req, res, next) {
-
+Util.getNav = async function () {
   let data = await invModel.getClassifications()
   let list = "<ul>"
   list += '<li><a href="/" title="Home page">Home</a></li>'
@@ -25,15 +24,11 @@ Util.getNav = async function (req, res, next) {
   return list
 }
 
-module.exports = Util
-
-
-
 /* **************************************
 * Build the classification view HTML
 * ************************************ */
 Util.buildClassificationGrid = async function(data){
-  let grid
+  let grid = ""
   if(data.length > 0){
     grid = '<ul id="inv-display">'
     data.forEach(vehicle => { 
@@ -61,3 +56,28 @@ Util.buildClassificationGrid = async function(data){
   }
   return grid
 }
+
+/* ************************
+ * Build the vehicle detail view HTML
+ ************************** */
+Util.buildVehicleDetail = function(vehicle) {
+  const formatter = new Intl.NumberFormat("en-US")
+  const price = formatter.format(vehicle.inv_price)
+  const miles = formatter.format(vehicle.inv_miles)
+
+  return `
+    <div class="vehicle-detail">
+      <img src="${vehicle.inv_image}" alt="Image of ${vehicle.inv_make} ${vehicle.inv_model}">
+      <div class="vehicle-info">
+        <h2>${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}</h2>
+        <p><strong>Price:</strong> $${price}</p>
+        <p><strong>Mileage:</strong> ${miles} miles</p>
+        <p><strong>Description:</strong> ${vehicle.inv_description}</p>
+        <p><strong>Color:</strong> ${vehicle.inv_color}</p>
+      </div>
+    </div>
+  `
+}
+
+// ✅ Only one export!
+module.exports = Util

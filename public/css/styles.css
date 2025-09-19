@@ -410,3 +410,92 @@ footer {
         text-align: left;
     }
 }
+
+
+
+/* Inventory Detail Page Styles */
+.inventory-detail {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+.detail-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
+.detail-info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.detail-info h2 {
+  color: #2c3e50;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.price {
+  font-size: 1.8rem;
+  color: #e74c3c;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.detail-info p {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+  font-size: 1rem;
+  color: #34495e;
+}
+
+.detail-specs {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid #ecf0f1;
+}
+
+.detail-specs h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+/* Responsive Layout */
+@media (min-width: 768px) {
+  .inventory-detail {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Optional: Styling for call to action buttons */
+.detail-actions {
+  margin-top: 2rem;
+}
+
+.detail-actions button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.detail-actions button:hover {
+  background-color: #1c5980;
+}
