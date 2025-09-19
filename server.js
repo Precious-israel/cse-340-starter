@@ -15,7 +15,8 @@ app.use(expressLayouts);
 app.set("layout", "./layouts/layout");
 
 // Index route
-app.get("/", baseController.buildHome);
+app.get("/", utilities.handleErrors(baseController.buildHome));
+
 
 // Inventory routes
 app.use("/inv", inventoryRoute);
@@ -36,13 +37,19 @@ app.use((req, res, next) => {
 * Place after all other middleware
 *************************/
 app.use(async (err, req, res, next) => {
-  let nav = await utilities.getNav();
+  const nav = await utilities.getNav();
+  const status = err.status || 500;
+  const message = status === 404
+    ? err.message
+    : 'Oh no! There was a crash. Maybe try a different route?';
+
   console.error(`Error at: "${req.originalUrl}": ${err.message}`);
-  res.status(err.status || 500).render("errors/error", {
-    title: err.status === 404 ? "404 Not Found" : "Server Error",
-    message: err.message,
-    status: err.status || 500,
-    nav,
+
+  res.status(status).render("errors/error", {
+    title: status === 404 ? "404 Not Found" : "Server Error",
+    message,
+    status,  // ✅ Pass it explicitly to the view
+    nav
   });
 });
 
