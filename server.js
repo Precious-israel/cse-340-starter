@@ -39,14 +39,14 @@ app.use((req, res, next) => {
 app.use(async (err, req, res, next) => {
   const nav = await utilities.getNav();
   const status = err.status || 500;
-  const message = status === 404
+   const message = status === 404
     ? err.message
     : 'Oh no! There was a crash. Maybe try a different route?';
 
   console.error(`Error at: "${req.originalUrl}": ${err.message}`);
 
   res.status(status).render("errors/error", {
-    title: status === 404 ? "404 Not Found" : "Server Error",
+    title: status === 404 ? "Not Found" : "Server Error",
     message,
     status,  // ✅ Pass it explicitly to the view
     nav

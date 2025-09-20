@@ -331,13 +331,34 @@ body {
 
 /* Footer separation */
 footer {
-    margin-top: 40px;
-    padding: 20px;
-    text-align: left;
-    color: black;
-    font-weight: bold;
-    font-size: large;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid #ddd;
+  padding: 20px 30px;
+  background-color: #f8f9fa;
+  color: #555;
+  font-size: 0.95rem;
+  font-weight: bold;
 }
+
+footer p {
+  margin: 5px 0;
+}
+
+footer a {
+  color: #007BFF;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+footer a:hover {
+  text-decoration: underline;
+  color: #0056b3;
+}
+
+
 
 /* media query for small screen at 680px*/
 
@@ -406,72 +427,93 @@ footer {
         gap: 20px;
     }
 
-    footer {
-        text-align: left;
-    }
+   footer {
+    flex-direction: column;
+    align-items: flex-start;
+    font-weight: bold;
+    gap: 5px;
+  }
+
+  footer p {
+    width: 100%;
+  }
 }
 
 
 
 /* Inventory Detail Page Styles */
-.inventory-detail {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-  padding: 2rem;
+.vehicle-container {
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
 }
 
-.detail-image img {
+.vehicle-detail {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  flex-wrap: wrap;
+  border: 1px solid #e0e0e0;
+}
+
+.vehicle-detail img {
   width: 100%;
+  max-width: 500px;
   height: auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  flex: 1 1 45%;
 }
 
-.detail-info {
-  padding: 1rem;
+.vehicle-info {
+  flex: 1 1 45%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 1.5rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
 }
 
-.detail-info h2 {
-  color: #2c3e50;
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.price {
-  font-size: 1.8rem;
-  color: #e74c3c;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-
-.detail-info p {
+.vehicle-info h2 {
+  font-size: 2.2rem;
+  color: #1a1a1a;
   margin-bottom: 0.5rem;
+  border-bottom: 2px solid #007BFF;
+  padding-bottom: 0.5rem;
+}
+
+.vehicle-info p {
+  font-size: 1.1rem;
   line-height: 1.6;
-  font-size: 1rem;
-  color: #34495e;
+  margin: 0;
 }
 
-.detail-specs {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 2px solid #ecf0f1;
+.vehicle-info p strong {
+  display: inline-block;
+  width: 120px;
+  color: #007BFF;
 }
 
-.detail-specs h3 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
+@media screen and (max-width: 768px) {
+  .vehicle-detail {
+    flex-direction: column;
+  }
+
+  .vehicle-detail img {
+    max-width: 100%;
+  }
+
+  .vehicle-info {
+    width: 100%;
+  }
 }
+
 
 /* Responsive Layout */
 @media (min-width: 768px) {
@@ -498,4 +540,70 @@ footer {
 
 .detail-actions button:hover {
   background-color: #1c5980;
+}
+
+
+/* ---------------------------
+   Error Page Styling
+---------------------------- */
+.error-container {
+  max-width: 600px;
+  margin: 10vh auto;
+  text-align: center;
+  padding: 40px 30px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.error-container h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #dc3545; /* Bootstrap's danger red */
+  margin-bottom: 20px;
+}
+
+.error-container p {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.error-button {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #007BFF;
+  color: #ffffff;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.error-button:hover {
+  background-color: #0056b3;
+  text-decoration: none;
+}
+
+@media (max-width: 600px) {
+  .error-container {
+    margin: 5vh 5%;
+    padding: 30px 20px;
+  }
+
+  .error-container h1 {
+    font-size: 2rem;
+  }
+
+  .error-container p {
+    font-size: 1rem;
+  }
+
+  .error-button {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.1rem;
+  }
 }
