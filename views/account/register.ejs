@@ -1,0 +1,55 @@
+<%- include('../partials/header') %>
+
+<h1><%= title %></h1>
+
+<!-- Flash messages -->
+<% if (messages('error').length > 0 || messages('info').length > 0) { %>
+  <div id="message">
+    <%= messages('error') %>
+    <%= messages('info') %>
+  </div>
+<% } %>
+
+<form id="registrationForm" method="post" action="/account/register">
+  <label for="first_name">First Name</label>
+  <input type="text" id="first_name" name="first_name" required
+         value="<%= typeof first_name != 'undefined' ? first_name : '' %>">
+
+  <label for="last_name">Last Name</label>
+  <input type="text" id="last_name" name="last_name" required
+         value="<%= typeof last_name != 'undefined' ? last_name : '' %>">
+
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" required
+         value="<%= typeof email != 'undefined' ? email : '' %>">
+
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" required>
+
+  <!-- Password requirements message -->
+  <div class="password-rules">
+    <p><strong>Password must:</strong></p>
+    <ul>
+      <li>Be at least 12 characters long</li>
+      <li>Include at least 1 uppercase letter</li>
+      <li>Include at least 1 number</li>
+      <li>Include at least 1 special character</li>
+    </ul>
+  </div>
+
+  <!-- Toggle Password Visibility -->
+  <label>
+    <input type="checkbox" onclick="togglePassword()"> Show Password
+  </label>
+
+  <button type="submit">Register</button>
+</form>
+
+<script>
+  function togglePassword() {
+    const pwField = document.getElementById("password");
+    pwField.type = pwField.type === "password" ? "text" : "password";
+  }
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,61 +1,119 @@
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
 require("dotenv").config();
+const session = require("express-session");
+const flash = require("connect-flash");
+const bodyParser = require("body-parser");
+
 const app = express();
 
+// Routes and utilities
 const staticRoutes = require("./routes/static");
 const inventoryRoute = require("./routes/inventoryRoute");
-const baseController = require("./controllers/baseController");
+const accountRoute = require("./routes/accountRoute");
 const errorRoute = require("./routes/errorRoute");
+const baseController = require("./controllers/baseController");
 const utilities = require("./utilities/");
+const pool = require("./database/");
 
+// -------------------------
+// Middleware
+// -------------------------
+
+// Session middleware with PostgreSQL session store
+app.use(
+  session({
+    store: new (require("connect-pg-simple")(session))({
+      createTableIfMissing: true,
+      pool,
+    }),
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    name: "sessionId",
+    
+  })
+);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+// Flash messages
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.messages = require("express-messages")(req, res);
+  next();
+});
+
+// Body parsers for handling POST requests
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files (e.g., CSS, images)
+app.use(express.static("public"));
+
+// -------------------------
 // View Engine
+// -------------------------
+
 app.set("view engine", "ejs");
 app.use(expressLayouts);
 app.set("layout", "./layouts/layout");
 
-// Index route
+// -------------------------
+// Routes
+// -------------------------
+
+// Home route
 app.get("/", utilities.handleErrors(baseController.buildHome));
 
-
-// Inventory routes
+// Feature routes
 app.use("/inv", inventoryRoute);
+app.use("/account", accountRoute);
 
-// Other routes
+
+// Static and error routes
 app.use(staticRoutes);
-app.use("/", errorRoute); // ✅ Moved here before error handlers
+app.use("/", errorRoute); // catch-all for unhandled paths
 
-// File Not Found Route (404) - keep only ONE
+// -------------------------
+// 404 Not Found Handler
+// -------------------------
+
 app.use((req, res, next) => {
   const error = new Error("Sorry, we appear to have lost that page.");
   error.status = 404;
   next(error);
 });
 
-/* ***********************
-* Express Error Handler
-* Place after all other middleware
-*************************/
+// -------------------------
+// Express Global Error Handler
+// -------------------------
+
 app.use(async (err, req, res, next) => {
   const nav = await utilities.getNav();
   const status = err.status || 500;
-   const message = status === 404
-    ? err.message
-    : 'Oh no! There was a crash. Maybe try a different route?';
+  const message =
+    status === 404
+      ? err.message
+      : "Oh no! There was a crash. Maybe try a different route?";
 
   console.error(`Error at: "${req.originalUrl}": ${err.message}`);
 
   res.status(status).render("errors/error", {
     title: status === 404 ? "Not Found" : "Server Error",
     message,
-    status,  // ✅ Pass it explicitly to the view
-    nav
+    status,
+    nav,
   });
 });
 
-// Server
+// -------------------------
+// Start Server
+// -------------------------
+
 const port = process.env.PORT || 5500;
 const host = process.env.HOST || "localhost";
+
 app.listen(port, () => {
   console.log(`App listening on ${host}:${port}`);
 });
