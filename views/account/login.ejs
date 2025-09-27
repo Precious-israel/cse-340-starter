@@ -5,6 +5,19 @@
 <head>
   <meta charset="UTF-8">
   <title><%= title %></title>
+  <style>
+    .password-rules {
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 0.9em;
+    }
+    .password-rules ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+  </style>
 </head>
 <body>
 
@@ -16,18 +29,47 @@
   <% } %>
 
   <!-- Login Form -->
-  <form action="/accounts/login" method="post">
+  <form action="/account/login" method="post">
     <label for="account_email">Email:</label>
     <input type="email" id="account_email" name="account_email" required>
 
     <label for="account_password">Password:</label>
-    <input type="password" id="account_password" name="account_password" required>
+    <input 
+      type="password" 
+      id="account_password" 
+      name="account_password" 
+      required
+      pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+    >
+
+    <!-- Password requirements message -->
+    <div class="password-rules">
+      <p><strong>Password must:</strong></p>
+      <ul>
+        <li>Be at least 12 characters long</li>
+        <li>Include at least 1 uppercase letter</li>
+        <li>Include at least 1 number</li>
+        <li>Include at least 1 special character</li>
+      </ul>
+    </div>
+
+    <!-- Toggle Password Visibility -->
+    <label>
+      <input type="checkbox" onclick="togglePassword()"> Show Password
+    </label>
 
     <button type="submit">Login</button>
   </form>
 
   <!-- Registration Link -->
   <p>Don't have an account? <a href="/account/register">Create one</a></p>
+
+  <script>
+    function togglePassword() {
+      const pwField = document.getElementById("account_password");
+      pwField.type = pwField.type === "password" ? "text" : "password";
+    }
+  </script>
 
 </body>
 </html>

@@ -16,11 +16,11 @@ const baseController = require("./controllers/baseController");
 const utilities = require("./utilities/");
 const pool = require("./database/");
 
-// -------------------------
+/// -------------------------
 // Middleware
 // -------------------------
 
-// Session middleware with PostgreSQL session store
+// Session setup
 app.use(
   session({
     store: new (require("connect-pg-simple")(session))({
@@ -31,11 +31,12 @@ app.use(
     resave: true,
     saveUninitialized: true,
     name: "sessionId",
-    
   })
 );
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+// Parse incoming requests
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // handles form data
 
 // Flash messages
 app.use(flash());
@@ -44,12 +45,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Body parsers for handling POST requests
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Serve static files (e.g., CSS, images)
+// Serve static files (CSS, JS, etc.)
 app.use(express.static("public"));
+
 
 // -------------------------
 // View Engine

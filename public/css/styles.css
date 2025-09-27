@@ -607,3 +607,34 @@ footer a:hover {
     font-size: 1.1rem;
   }
 }
+
+
+
+/*Login css */
+  .password-rules {
+    background-color: #f0f4f8;
+    border-left: 4px solid #0077cc;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+  }
+
+  .password-rules ul {
+    margin: 5px 0 0 20px;
+    padding: 0;
+  }
+
+  .feedback {
+    font-size: 0.9em;
+    color: red;
+    margin-top: 5px;
+  }
+
+  input:invalid {
+    border-color: red;
+  }
+
+  input:valid {
+    border-color: green;
+  }
+

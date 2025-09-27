@@ -1,7 +1,4 @@
-<%- include('../partials/header') %>
-
-<h1><%= title %></h1>
-
+<h1>Register</h1>
 <!-- Flash messages -->
 <% if (messages('error').length > 0 || messages('info').length > 0) { %>
   <div id="message">
@@ -9,47 +6,102 @@
     <%= messages('info') %>
   </div>
 <% } %>
+<% if (errors) { %>
+  <ul class="notice">
+ <% errors.array().forEach(error => { %>
+   <li><%= error.msg %></li>
+<%  }) %>
+ </ul>
+<% } %>
 
-<form id="registrationForm" method="post" action="/account/register">
+<form id="registrationForm" method="post" action="/account/register" novalidate>
+  <!-- First Name -->
   <label for="first_name">First Name</label>
-  <input type="text" id="first_name" name="first_name" required
-         value="<%= typeof first_name != 'undefined' ? first_name : '' %>">
+  <input 
+    type="text" 
+    id="first_name" 
+    name="first_name" 
+    required
+    value="<%= typeof first_name !== 'undefined' ? first_name : '' %>">
 
+  <!-- Last Name -->
   <label for="last_name">Last Name</label>
-  <input type="text" id="last_name" name="last_name" required
-         value="<%= typeof last_name != 'undefined' ? last_name : '' %>">
+  <input 
+    type="text" 
+    id="last_name" 
+    name="last_name" 
+    required
+    value="<%= typeof last_name !== 'undefined' ? last_name : '' %>">
 
+  <!-- Email -->
   <label for="email">Email</label>
-  <input type="email" id="email" name="email" required
-         value="<%= typeof email != 'undefined' ? email : '' %>">
+  <input 
+    type="email" 
+    id="email" 
+    name="email" 
+    required
+    value="<%= typeof email !== 'undefined' ? email : '' %>">
 
+  <!-- Password -->
   <label for="password">Password</label>
-  <input type="password" id="password" name="password" required>
 
-  <!-- Password requirements message -->
-  <div class="password-rules">
+
+  <input 
+    type="password" 
+    id="password" 
+    name="password" 
+    required
+    pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+    title="Password must be at least 12 characters long and include 1 uppercase letter, 1 number, and 1 special character."
+    oninput="validatePassword()"
+  >
+
+  <!-- Real-time validation feedback -->
+  <p id="passwordFeedback" class="feedback"></p>
+
+  <!-- Show Password -->
+  <label>
+    <input type="checkbox" onclick="togglePassword()"> Show Password
+  </label>
+
+
+  <div class="password-rules" id="passwordHelp">
     <p><strong>Password must:</strong></p>
     <ul>
-      <li>Be at least 12 characters long</li>
+      <li>Be at least 12 characters</li>
       <li>Include at least 1 uppercase letter</li>
       <li>Include at least 1 number</li>
       <li>Include at least 1 special character</li>
     </ul>
   </div>
 
-  <!-- Toggle Password Visibility -->
-  <label>
-    <input type="checkbox" onclick="togglePassword()"> Show Password
-  </label>
-
+  <!-- Submit -->
   <button type="submit">Register</button>
 </form>
 
+
+
+<!-- Scripts -->
 <script>
   function togglePassword() {
     const pwField = document.getElementById("password");
     pwField.type = pwField.type === "password" ? "text" : "password";
   }
-</script>
 
-<%- include('../partials/footer') %>
+  function validatePassword() {
+    const pwField = document.getElementById("password");
+    const feedback = document.getElementById("passwordFeedback");
+    const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$/;
+
+    if (pwField.value === "") {
+      feedback.textContent = "";
+      return;
+    }
+
+    if (!regex.test(pwField.value)) {
+      feedback.textContent = "Password does not meet requirements.";
+    } else {
+      feedback.textContent = "";
+    }
+  }
+</script>
