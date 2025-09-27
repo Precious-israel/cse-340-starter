@@ -3,24 +3,25 @@ const expressLayouts = require("express-ejs-layouts");
 require("dotenv").config();
 const session = require("express-session");
 const flash = require("connect-flash");
-const bodyParser = require("body-parser");
-
+const path = require("path"); // ✅ Needed for robust static file pathing
 const app = express();
 
-// Routes and utilities
+// Database and utilities
+const pool = require("./database/");
+const utilities = require("./utilities/");
+
+// Routes and controllers
 const staticRoutes = require("./routes/static");
 const inventoryRoute = require("./routes/inventoryRoute");
 const accountRoute = require("./routes/accountRoute");
 const errorRoute = require("./routes/errorRoute");
 const baseController = require("./controllers/baseController");
-const utilities = require("./utilities/");
-const pool = require("./database/");
 
-/// -------------------------
+// -------------------------
 // Middleware
 // -------------------------
 
-// Session setup
+// ✅ Session setup
 app.use(
   session({
     store: new (require("connect-pg-simple")(session))({
@@ -28,26 +29,31 @@ app.use(
       pool,
     }),
     secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
+    resave: false,              // ✅ Use false to avoid unnecessary session writes
+    saveUninitialized: false,   // ✅ Only save session if something is stored
     name: "sessionId",
+    cookie: {
+      maxAge: 1000 * 60 * 60, // Optional: 1 hour expiration
+      secure: false, // set to true if using HTTPS
+      httpOnly: true,
+    },
   })
 );
 
-// Parse incoming requests
+// ✅ Parse incoming requests
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // handles form data
+app.use(express.urlencoded({ extended: true }));
 
-// Flash messages
+// ✅ Flash messages
 app.use(flash());
 app.use((req, res, next) => {
   res.locals.messages = require("express-messages")(req, res);
+  res.locals.loggedin = req.session.loggedin || false; // Optional: useful for UI
   next();
 });
 
-// Serve static files (CSS, JS, etc.)
-app.use(express.static("public"));
-
+// ✅ Serve static files robustly
+app.use(express.static(path.join(__dirname, "public"))); // <-- FIXED
 
 // -------------------------
 // View Engine
@@ -61,17 +67,13 @@ app.set("layout", "./layouts/layout");
 // Routes
 // -------------------------
 
-// Home route
 app.get("/", utilities.handleErrors(baseController.buildHome));
-
-// Feature routes
 app.use("/inv", inventoryRoute);
 app.use("/account", accountRoute);
 
-
 // Static and error routes
 app.use(staticRoutes);
-app.use("/", errorRoute); // catch-all for unhandled paths
+app.use("/", errorRoute); // catch-all route
 
 // -------------------------
 // 404 Not Found Handler
@@ -84,7 +86,7 @@ app.use((req, res, next) => {
 });
 
 // -------------------------
-// Express Global Error Handler
+// Global Error Handler
 // -------------------------
 
 app.use(async (err, req, res, next) => {
@@ -113,5 +115,5 @@ const port = process.env.PORT || 5500;
 const host = process.env.HOST || "localhost";
 
 app.listen(port, () => {
-  console.log(`App listening on ${host}:${port}`);
+  console.log(`App listening on http://${host}:${port}`);
 });
