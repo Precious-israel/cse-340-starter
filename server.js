@@ -30,7 +30,7 @@ app.use(
     }),
     secret: process.env.SESSION_SECRET,
     resave: false,              // ✅ Use false to avoid unnecessary session writes
-    saveUninitialized: false,   // ✅ Only save session if something is stored
+    saveUninitialized: true,   // ✅ Only save session if something is stored
     name: "sessionId",
     cookie: {
       maxAge: 1000 * 60 * 60, // Optional: 1 hour expiration

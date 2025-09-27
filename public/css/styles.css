@@ -759,3 +759,137 @@ p a:hover {
     padding: 10px;
   }
 }
+
+ /* Frontend checklist  */
+  main {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  h1 {
+    margin-bottom: 1.5rem;
+  }
+  .management-links {
+    list-style: none;
+    padding: 0;
+  }
+  .management-links li {
+    margin-bottom: 1rem;
+  }
+  .management-links a {
+    display: inline-block;
+    padding: 0.75rem 1.25rem;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 0.3rem;
+    font-weight: bold;
+  }
+  .management-links a:hover,
+  .management-links a:focus {
+    background-color: #0056b3;
+    outline: none;
+  }
+
+/* add- inventory*/
+    main {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: bold;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.25rem;
+    border: 1px solid #ccc;
+    border-radius: 0.3rem;
+  }
+
+  textarea {
+    height: 100px;
+  }
+
+  button {
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.25rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 0.3rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  #messages {
+    margin-bottom: 1rem;
+    color: #d8000c;
+    background-color: #ffd2d2;
+    padding: 0.75rem;
+    border-radius: 0.3rem;
+  }
+
+
+  /* Management Links Styles */
+.management-links {
+    list-style: none;
+    padding: 0;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.management-links li {
+    margin-bottom: 1rem;
+}
+
+.management-links a {
+    display: block;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.management-links a:hover {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Messages Section */
+#messages {
+    margin: 1rem 0;
+}
+
+/* Ensure the main content is properly centered */
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+}

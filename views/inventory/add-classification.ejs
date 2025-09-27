@@ -1,0 +1,28 @@
+
+
+<main>
+  <h1>Add New Classification</h1>
+
+  <!-- Flash Message Area -->
+  <section id="messages">
+    <%- messages() %>
+  </section>
+
+  <form action="/inv/add-classification" method="post">
+
+    <label for="classification_name">
+      Classification Name:
+      <span class="note">()</span>
+    </label>
+    <input
+      type="text"
+      id="classification_name"
+      name="classification_name"
+      required
+      pattern="^[a-zA-Z0-9]+$"
+      title="Only letters and numbers, no spaces or special characters"
+      maxlength="30"
+    />
+
+    <button type="submit">Add Classification</button>
+  </form>

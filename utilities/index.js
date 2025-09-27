@@ -1,6 +1,7 @@
 const invModel = require("../models/inventory-model")
-const Util = {}
+const { body, validationResult } = require("express-validator")
 
+const Util = {}
 
 /* ************************
  * Constructs the nav HTML unordered list
@@ -11,57 +12,41 @@ Util.getNav = async function () {
   list += '<li><a href="/" title="Home page">Home</a></li>'
   data.rows.forEach((row) => {
     list += "<li>"
-    list +=
-      '<a href="/inv/type/' +
-      row.classification_id +
-      '" title="See our inventory of ' +
-      row.classification_name +
-      ' vehicles">' +
-      row.classification_name +
-      "</a>"
+    list += `<a href="/inv/type/${row.classification_id}" title="See our inventory of ${row.classification_name} vehicles">${row.classification_name}</a>`
     list += "</li>"
   })
   list += "</ul>"
   return list
 }
 
-/* **************************************
-* Build the classification view HTML
-* ************************************ */
-Util.buildClassificationGrid = async function(data){
+/* ************************
+ * Build the classification grid for inventory listing
+ ************************** */
+Util.buildClassificationGrid = async function (data) {
   let grid = ""
-  if(data.length > 0){
+  if (data.length > 0) {
     grid = '<ul id="inv-display">'
-    data.forEach(vehicle => { 
-      grid += '<li>'
-      grid +=  '<a href="../../inv/detail/'+ vehicle.inv_id 
-      + '" title="View ' + vehicle.inv_make + ' '+ vehicle.inv_model 
-      + 'details"><img src="' + vehicle.inv_thumbnail 
-      +'" alt="Image of '+ vehicle.inv_make + ' ' + vehicle.inv_model 
-      +' on CSE Motors" /></a>'
+    data.forEach(vehicle => {
+      grid += "<li>"
+      grid += `<a href="../../inv/detail/${vehicle.inv_id}" title="View ${vehicle.inv_make} ${vehicle.inv_model} details"><img src="${vehicle.inv_thumbnail}" alt="Image of ${vehicle.inv_make} ${vehicle.inv_model} on CSE Motors"></a>`
       grid += '<div class="namePrice">'
-      grid += '<hr />'
-      grid += '<h2>'
-      grid += '<a href="../../inv/detail/' + vehicle.inv_id +'" title="View ' 
-      + vehicle.inv_make + ' ' + vehicle.inv_model + ' details">' 
-      + vehicle.inv_make + ' ' + vehicle.inv_model + '</a>'
-      grid += '</h2>'
-      grid += '<span>$' 
-      + new Intl.NumberFormat('en-US').format(vehicle.inv_price) + '</span>'
-      grid += '</div>'
-      grid += '</li>'
+      grid += "<hr />"
+      grid += `<h2><a href="../../inv/detail/${vehicle.inv_id}" title="View ${vehicle.inv_make} ${vehicle.inv_model} details">${vehicle.inv_make} ${vehicle.inv_model}</a></h2>`
+      grid += `<span>$${new Intl.NumberFormat("en-US").format(vehicle.inv_price)}</span>`
+      grid += "</div>"
+      grid += "</li>"
     })
-    grid += '</ul>'
-  } else { 
+    grid += "</ul>"
+  } else {
     grid += '<p class="notice">Sorry, no matching vehicles could be found.</p>'
   }
   return grid
 }
 
 /* ************************
- * Build the vehicle detail view HTML
+ * Build the vehicle detail view
  ************************** */
-Util.buildVehicleDetail = function(vehicle) {
+Util.buildVehicleDetail = function (vehicle) {
   const formatter = new Intl.NumberFormat("en-US")
   const price = formatter.format(vehicle.inv_price)
   const miles = formatter.format(vehicle.inv_miles)
@@ -80,12 +65,96 @@ Util.buildVehicleDetail = function(vehicle) {
   `
 }
 
-/* ****************************************
- * Middleware For Handling Errors
- * Wrap other function in this for 
- * General Error Handling
- **************************************** */
+/* ************************
+ * Build classification dropdown <select> list
+ ************************** */
+Util.buildClassificationList = async function (classification_id = null) {
+  let data = await invModel.getClassifications()
+  let classificationList = '<select name="classification_id" id="classificationList" required>'
+  classificationList += "<option value=''>Choose a Classification</option>"
+  data.rows.forEach((row) => {
+    classificationList += `<option value="${row.classification_id}"`
+    if (classification_id != null && row.classification_id == classification_id) {
+      classificationList += " selected"
+    }
+    classificationList += `>${row.classification_name}</option>`
+  })
+  classificationList += "</select>"
+  return classificationList
+}
+
+/* ************************
+ * Validation Rules & Middleware
+ ************************** */
+
+// -- Classification Name Rules (no spaces or special chars)
+Util.classificationRules = () => {
+  return [
+    body("classification_name")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("Classification name is required.")
+      .matches(/^[a-zA-Z0-9]+$/)
+      .withMessage("No spaces or special characters allowed.")
+  ]
+}
+
+// -- Classification Form Validation Handler
+Util.checkClassificationData = async (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    req.flash("message", errors.array().map(err => err.msg).join("<br>"))
+    return res.render("inventory/add-classification", {
+      title: "Add New Classification",
+      message: req.flash("message"),
+    })
+  }
+  next()
+}
+
+// -- Inventory Item Rules
+Util.vehicleRules = () => {
+  return [
+    body("inv_make").trim().notEmpty().withMessage("Make is required."),
+    body("inv_model").trim().notEmpty().withMessage("Model is required."),
+    body("inv_description").trim().notEmpty().withMessage("Description is required."),
+    body("inv_image").trim().notEmpty().withMessage("Image path is required."),
+    body("inv_thumbnail").trim().notEmpty().withMessage("Thumbnail path is required."),
+    body("inv_price").isFloat({ min: 0 }).withMessage("Price must be a number greater than 0."),
+    body("inv_year").isInt({ min: 1886 }).withMessage("Year must be a valid number."),
+    body("inv_miles").isInt({ min: 0 }).withMessage("Miles must be a non-negative integer."),
+    body("inv_color").trim().notEmpty().withMessage("Color is required."),
+    body("classification_id").notEmpty().withMessage("Classification must be selected.")
+  ]
+}
+
+// -- Inventory Form Validation Handler (with sticky form)
+Util.checkVehicleData = async (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    const classificationList = await Util.buildClassificationList(req.body.classification_id)
+    req.flash("message", errors.array().map(err => err.msg).join("<br>"))
+    return res.render("inventory/add-inventory", {
+      title: "Add New Inventory",
+      classificationList,
+      message: req.flash("message"),
+      inv_make: req.body.inv_make,
+      inv_model: req.body.inv_model,
+      inv_description: req.body.inv_description,
+      inv_image: req.body.inv_image,
+      inv_thumbnail: req.body.inv_thumbnail,
+      inv_price: req.body.inv_price,
+      inv_year: req.body.inv_year,
+      inv_miles: req.body.inv_miles,
+      inv_color: req.body.inv_color
+    })
+  }
+  next()
+}
+
+/* ************************
+ * General Error Wrapper
+ ************************** */
 Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
 
-// ✅ Only one export!
 module.exports = Util
