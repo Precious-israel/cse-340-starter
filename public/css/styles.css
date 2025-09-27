@@ -604,37 +604,158 @@ footer a:hover {
   .error-button {
     width: 100%;
     padding: 14px;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 }
 
 
 
-/*Login css */
-  .password-rules {
-    background-color: #f0f4f8;
-    border-left: 4px solid #0077cc;
+/* Forms css */
+  /* General Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7f9;
+  color: #333;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+/* Form Container */
+form {
+  background: #fff;
+  padding: 25px;
+  max-width: 500px;
+  margin: 30px auto;
+  border-radius: 8px;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Headings */
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+/* Labels */
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bolder;
+}
+
+/* Inputs */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 18px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Buttons */
+button {
+  width: 100%;
+  background-color: #007bff;
+  color: #fff;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Checkbox */
+input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+/* Feedback / Messages */
+#message,
+.flash-message {
+  background-color: #ffefef;
+  color: #c0392b;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #e0b4b4;
+  border-radius: 4px;
+}
+
+.notice {
+  list-style: none;
+  margin-bottom: 20px;
+  color: #c0392b;
+  padding-left: 0;
+}
+
+.notice li {
+  margin-bottom: 8px;
+}
+
+/* Password Feedback */
+.feedback {
+  color: #e74c3c;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+
+/* Password Rules */
+.password-rules {
+  background-color: #eef3f7;
+  border: 2px solid #347dca;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 0.9em;
+}
+
+.password-rules ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.password-rules li {
+  margin-bottom: 6px;
+}
+
+/* Registration link */
+p a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+p a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  form {
+    padding: 20px;
+    margin: 20px 10px;
+  }
+
+  button {
+    font-size: 1em;
     padding: 10px;
-    margin-bottom: 10px;
-    font-size: 0.9em;
   }
-
-  .password-rules ul {
-    margin: 5px 0 0 20px;
-    padding: 0;
-  }
-
-  .feedback {
-    font-size: 0.9em;
-    color: red;
-    margin-top: 5px;
-  }
-
-  input:invalid {
-    border-color: red;
-  }
-
-  input:valid {
-    border-color: green;
-  }
-
+}

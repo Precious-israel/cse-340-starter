@@ -29,10 +29,29 @@
   <% } %>
 
   <!-- Login Form -->
-   <form id="loginForm" action="/account/login" method="post">
+  <form id="loginForm" action="/account/login" method="post">
 
-  <input type="email" name="account_email" id="loginEmail" required value="<%= locals.account_email %>">
+    <!-- Name -->
+    <label for="account_name">Name:</label>
+    <input 
+      type="text" 
+      name="account_name" 
+      id="account_name" 
+      required 
+      value="<%= locals.account_name || '' %>"
+    >
 
+    <!-- Email -->
+    <label for="loginEmail">Email:</label>
+    <input 
+      type="email" 
+      name="account_email" 
+      id="loginEmail" 
+      required 
+      value="<%= locals.account_email || '' %>"
+    >
+
+    <!-- Password -->
     <label for="account_password">Password:</label>
     <input 
       type="password" 
@@ -42,7 +61,7 @@
       pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
     >
 
-    <!-- Password requirements message -->
+    <!-- Password requirements -->
     <div class="password-rules">
       <p><strong>Password must:</strong></p>
       <ul>
