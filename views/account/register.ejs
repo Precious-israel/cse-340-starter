@@ -1,104 +1,145 @@
-<h1>Register</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+  <style>
+    .notice {
+      color: red;
+      list-style: none;
+    }
+    .feedback {
+      color: red;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+    }
+    .password-rules {
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 0.9em;
+    }
+    .password-rules ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    #message {
+      margin-bottom: 1em;
+      color: #0077cc;
+    }
+  </style>
+</head>
+<body>
 
-<!-- Flash messages -->
-<% if (messages('error').length > 0 || messages('info').length > 0) { %>
-  <div id="message">
-    <%= messages('error') %>
-    <%= messages('info') %>
-  </div>
-<% } %>
+  <h1>Register</h1>
 
-<% if (errors) { %>
-  <ul class="notice">
-    <% errors.array().forEach(error => { %>
-      <li><%= error.msg %></li>
-    <% }) %>
-  </ul>
-<% } %>
+  <!-- Flash messages -->
+  <% if (messages().notice && messages().notice.length > 0) { %>
+    <div id="message">
+      <% messages().notice.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
 
-<form id="registrationForm" method="post" action="/account/register" novalidate>
-  <!-- First Name -->
-  <label for="accountFirstname">First Name</label>
-  <input 
-    type="text" 
-    id="accountFirstname" 
-    name="account_firstname" 
-    required
-    value="<%= locals.account_firstname %>">
-
-  <!-- Last Name -->
-  <label for="accountLastname">Last Name</label>
-  <input 
-    type="text" 
-    id="accountLastname" 
-    name="account_lastname" 
-    required
-    value="<%= locals.account_lastname %>">
-
-  <!-- Email -->
-  <label for="accountEmail">Email</label>
-  <input 
-    type="email" 
-    id="accountEmail" 
-    name="account_email" 
-    required
-    value="<%= locals.account_email %>">
-
-  <!-- Password -->
-  <label for="password">Password</label>
-  <input 
-    type="password" 
-    id="password" 
-    name="password" 
-    required
-    pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
-    title="Password must be at least 12 characters long and include 1 uppercase letter, 1 number, and 1 special character."
-    oninput="validatePassword()"
-  >
-
-  <!-- Real-time validation feedback -->
-  <p id="passwordFeedback" class="feedback"></p>
-
-  <!-- Show Password -->
-  <label>
-    <input type="checkbox" onclick="togglePassword()"> Show Password
-  </label>
-
-  <div class="password-rules" id="passwordHelp">
-    <p><strong>Password must:</strong></p>
-    <ul>
-      <li>Be at least 12 characters</li>
-      <li>Include at least 1 uppercase letter</li>
-      <li>Include at least 1 number</li>
-      <li>Include at least 1 special character</li>
+  <!-- Validation Errors -->
+  <% if (errors) { %>
+    <ul class="notice">
+      <% errors.array().forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
     </ul>
-  </div>
+  <% } %>
 
-  <!-- Submit -->
-  <button type="submit">Register</button>
-</form>
+  <!-- Registration Form -->
+  <form id="registrationForm" method="post" action="/account/register" novalidate>
+    <!-- First Name -->
+    <label for="accountFirstname">First Name</label>
+    <input 
+      type="text" 
+      id="accountFirstname" 
+      name="account_firstname" 
+      required
+      value="<%= locals.account_firstname || '' %>">
 
-<!-- Scripts -->
-<script>
-  function togglePassword() {
-    const pwField = document.getElementById("password");
-    pwField.type = pwField.type === "password" ? "text" : "password";
-  }
+    <!-- Last Name -->
+    <label for="accountLastname">Last Name</label>
+    <input 
+      type="text" 
+      id="accountLastname" 
+      name="account_lastname" 
+      required
+      value="<%= locals.account_lastname || '' %>">
 
-  function validatePassword() {
-    const pwField = document.getElementById("password");
-    const feedback = document.getElementById("passwordFeedback");
-    const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$/;
+    <!-- Email -->
+    <label for="accountEmail">Email</label>
+    <input 
+      type="email" 
+      id="accountEmail" 
+      name="account_email" 
+      required
+      value="<%= locals.account_email || '' %>">
 
-    if (pwField.value === "") {
-      feedback.textContent = "";
-      return;
+    <!-- Password -->
+    <label for="account_password">Password</label>
+    <input 
+      type="password" 
+      id="account_password" 
+      name="account_password" 
+      required
+      pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+      title="Password must be at least 12 characters long and include 1 uppercase letter, 1 number, and 1 special character."
+      oninput="validatePassword()"
+    >
+
+    <!-- Real-time validation feedback -->
+    <p id="passwordFeedback" class="feedback"></p>
+
+    <!-- Show Password -->
+    <label>
+      <input type="checkbox" onclick="togglePassword()"> Show Password
+    </label>
+
+    <!-- Password Requirements Info -->
+    <div class="password-rules" id="passwordHelp">
+      <p><strong>Password must:</strong></p>
+      <ul>
+        <li>Be at least 12 characters</li>
+        <li>Include at least 1 uppercase letter</li>
+        <li>Include at least 1 number</li>
+        <li>Include at least 1 special character</li>
+      </ul>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit">Register</button>
+  </form>
+
+  <!-- Scripts -->
+  <script>
+    function togglePassword() {
+      const pwField = document.getElementById("account_password");
+      pwField.type = pwField.type === "password" ? "text" : "password";
     }
 
-    if (!regex.test(pwField.value)) {
-      feedback.textContent = "Password does not meet requirements.";
-    } else {
-      feedback.textContent = "";
+    function validatePassword() {
+      const pwField = document.getElementById("account_password");
+      const feedback = document.getElementById("passwordFeedback");
+      const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$/;
+
+      if (pwField.value === "") {
+        feedback.textContent = "";
+        return;
+      }
+
+      if (!regex.test(pwField.value)) {
+        feedback.textContent = "Password does not meet requirements.";
+      } else {
+        feedback.textContent = "";
+      }
     }
-  }
-</script>
+  </script>
+
+</body>
+</html>

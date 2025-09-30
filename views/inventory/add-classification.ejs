@@ -4,9 +4,12 @@
   <h1>Add New Classification</h1>
 
   <!-- Flash Message Area -->
+ <% if (typeof messages === 'function' && messages().trim().length > 0) { %>
   <section id="messages">
     <%- messages() %>
   </section>
+<% } %>
+
 
   <form action="/inv/add-classification" method="post">
 

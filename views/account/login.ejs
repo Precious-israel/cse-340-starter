@@ -1,11 +1,13 @@
-<!-- views/account/login.ejs -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title><%= title %></title>
   <style>
+    .notice {
+      color: red;
+      list-style: none;
+    }
     .password-rules {
       background-color: #f9f9f9;
       border: 1px solid #ccc;
@@ -17,29 +19,36 @@
       margin: 0;
       padding-left: 20px;
     }
+    #message {
+      margin-bottom: 1em;
+      color: #0077cc;
+    }
   </style>
 </head>
 <body>
 
   <h1><%= title %></h1>
 
-  <!-- Flash message -->
-  <% if (typeof message !== "undefined") { %>
-    <div class="flash-message"><%= message %></div>
+  <!-- Flash messages -->
+  <% if (messages().notice && messages().notice.length > 0) { %>
+    <div id="message">
+      <% messages().notice.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- Validation Errors -->
+  <% if (errors) { %>
+    <ul class="notice">
+      <% errors.array().forEach(error => { %>
+        <li><%= error.msg %></li>
+      <% }) %>
+    </ul>
   <% } %>
 
   <!-- Login Form -->
   <form id="loginForm" action="/account/login" method="post">
-
-    <!-- Name -->
-    <label for="account_name">Name:</label>
-    <input 
-      type="text" 
-      name="account_name" 
-      id="account_name" 
-      required 
-      value="<%= locals.account_name || '' %>"
-    >
 
     <!-- Email -->
     <label for="loginEmail">Email:</label>
@@ -48,8 +57,7 @@
       name="account_email" 
       id="loginEmail" 
       required 
-      value="<%= locals.account_email || '' %>"
-    >
+      value="<%= locals.account_email || '' %>">
 
     <!-- Password -->
     <label for="account_password">Password:</label>
@@ -83,6 +91,7 @@
   <!-- Registration Link -->
   <p>Don't have an account? <a href="/account/register">Create one</a></p>
 
+  <!-- Scripts -->
   <script>
     function togglePassword() {
       const pwField = document.getElementById("account_password");

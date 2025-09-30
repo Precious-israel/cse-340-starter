@@ -834,13 +834,14 @@ p a:hover {
     background-color: #0056b3;
   }
 
-  #messages {
-    margin-bottom: 1rem;
-    color: #d8000c;
-    background-color: #ffd2d2;
-    padding: 0.75rem;
-    border-radius: 0.3rem;
-  }
+ .notice, .flash-message {
+  margin-bottom: 1rem;
+  color: #d8000c;
+  background-color: #ffd2d2;
+  padding: 0.75rem;
+  border-radius: 0.3rem;
+}
+
 
 
   /* Management Links Styles */
@@ -880,6 +881,15 @@ p a:hover {
 #messages {
     margin: 1rem 0;
 }
+
+input:invalid, textarea:invalid {
+  border: 2px solid red;
+}
+
+input:valid, textarea:valid {
+  border: 2px solid green;
+}
+
 
 /* Ensure the main content is properly centered */
 main {
