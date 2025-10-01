@@ -3,12 +3,16 @@ const expressLayouts = require("express-ejs-layouts");
 require("dotenv").config();
 const session = require("express-session");
 const flash = require("connect-flash");
-const path = require("path"); // ✅ Needed for robust static file pathing
+const path = require("path");
+const cookieParser = require("cookie-parser");
 const app = express();
 
 // Database and utilities
 const pool = require("./database/");
 const utilities = require("./utilities/");
+
+// Import the JWT middleware correctly
+const { checkJWTToken } = require('./utilities/auth');
 
 // Routes and controllers
 const staticRoutes = require("./routes/static");
@@ -18,10 +22,15 @@ const errorRoute = require("./routes/errorRoute");
 const baseController = require("./controllers/baseController");
 
 // -------------------------
-// Middleware
+// Middleware - IN CORRECT ORDER
 // -------------------------
 
-// ✅ Session setup
+// ✅ 1. First: Parse incoming requests
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // ← COOKIE PARSER MUST COME BEFORE SESSION AND JWT
+
+// ✅ 2. Session setup
 app.use(
   session({
     store: new (require("connect-pg-simple")(session))({
@@ -29,31 +38,29 @@ app.use(
       pool,
     }),
     secret: process.env.SESSION_SECRET,
-    resave: false,              // ✅ Use false to avoid unnecessary session writes
-    saveUninitialized: true,   // ✅ Only save session if something is stored
+    resave: false,
+    saveUninitialized: true,
     name: "sessionId",
     cookie: {
-      maxAge: 1000 * 60 * 60, // Optional: 1 hour expiration
-      secure: false, // set to true if using HTTPS
+      maxAge: 1000 * 60 * 60,
+      secure: false,
       httpOnly: true,
     },
   })
 );
 
-// ✅ Parse incoming requests
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// ✅ Flash messages
+// ✅ 3. Flash messages
 app.use(flash());
 app.use((req, res, next) => {
   res.locals.messages = require("express-messages")(req, res);
-  res.locals.loggedin = req.session.loggedin || false; // Optional: useful for UI
   next();
 });
 
-// ✅ Serve static files robustly
-app.use(express.static(path.join(__dirname, "public"))); // <-- FIXED
+// ✅ 4. JWT Token Check Middleware - AFTER cookieParser
+app.use(checkJWTToken); // ← Use the imported function directly
+
+// ✅ 5. Serve static files
+app.use(express.static(path.join(__dirname, "public")));
 
 // -------------------------
 // View Engine
@@ -73,7 +80,7 @@ app.use("/account", accountRoute);
 
 // Static and error routes
 app.use(staticRoutes);
-app.use("/", errorRoute); // catch-all route
+app.use("/", errorRoute);
 
 // -------------------------
 // 404 Not Found Handler

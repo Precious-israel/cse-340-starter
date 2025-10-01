@@ -38,10 +38,18 @@
     </div>
   <% } %>
 
-  <!-- Validation Errors -->
+    <!-- Validation Errors -->
   <% if (errors) { %>
     <ul class="notice">
-      <% errors.array().forEach(error => { %>
+      <% 
+        let errorArray;
+        if (typeof errors.array === 'function') {
+          errorArray = errors.array();
+        } else {
+          errorArray = Array.isArray(errors) ? errors : [errors];
+        }
+        errorArray.forEach(error => { 
+      %>
         <li><%= error.msg %></li>
       <% }) %>
     </ul>

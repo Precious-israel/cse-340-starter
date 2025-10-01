@@ -2,7 +2,6 @@ const utilities = require(".")
 const { body, validationResult } = require("express-validator")
 const accountModel = require("../models/account-model")
 
-
 /*  **********************************
   *  Registration Data Validation Rules
   * ********************************* */
@@ -50,21 +49,12 @@ function registrationRules() {
  * Check registration data and return errors or continue
  * ***************************** */
 async function checkRegData(req, res, next) {
-  const { account_firstname, account_lastname, account_email } = req.body
-  let errors = validationResult(req)
+  const errors = validationResult(req)
   if (!errors.isEmpty()) {
-    let nav = await utilities.getNav()
-    res.render("account/register", {
-      errors,
-      title: "Registration",
-      nav,
-      account_firstname,
-      account_lastname,
-      account_email,
-    })
-    return
+    console.log("Validation errors in checkRegData:", errors.array())
+    req.errors = errors // Attach errors to request object
   }
-  next()
+  next() // Always call next() to continue to controller
 }
 
 /*  **********************************
@@ -81,14 +71,7 @@ function loginRules() {
     body("account_password")
       .trim()
       .notEmpty()
-      .isStrongPassword({
-        minLength: 12,
-        minLowercase: 1,
-        minUppercase: 1,
-        minNumbers: 1,
-        minSymbols: 1,
-      })
-      .withMessage("Password does not meet requirements."),
+      .withMessage("Password is required."),
   ]
 }
 
@@ -96,19 +79,12 @@ function loginRules() {
  * Check login data and return errors or continue
  * ***************************** */
 async function checkLoginData(req, res, next) {
-  const { account_email } = req.body
-  let errors = validationResult(req)
+  const errors = validationResult(req)
   if (!errors.isEmpty()) {
-    let nav = await utilities.getNav()
-    res.render("account/login", {
-      errors,
-      title: "Login",
-      nav,
-      account_email,
-    })
-    return
+    console.log("Validation errors in checkLoginData:", errors.array())
+    req.errors = errors // Attach errors to request object
   }
-  next()
+  next() // Always call next() to continue to controller
 }
 
 module.exports = {
