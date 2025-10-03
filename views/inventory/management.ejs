@@ -1,12 +1,38 @@
-  <main>
-        <h1>Vehicle Management</h1>
+<main>
+  <h1>Vehicle Management</h1>
 
-        <section id="messages">
-            <%- messages() %>
-        </section>
+  <!-- Flash messages section -->
+  <section id="messages">
+    <%- messages() %>
+  </section>
 
-        <ul class="management-links">
-            <li><a href="/inv/add-classification">Add New Classification</a></li>
-            <li><a href="/inv/add-inventory">Add New Inventory</a></li>
-        </ul>
-    </main>
+  <!-- Navigation links for management actions -->
+  <ul class="management-links">
+    <li><a href="/inv/add-classification">Add New Classification</a></li>
+    <li><a href="/inv/add-inventory">Add New Inventory</a></li>
+  </ul>
+
+  <!-- New content: Heading, paragraph, select list, table, noscript -->
+  <h2>Manage Inventory</h2>
+
+  <p>Select a classification from the list to see the inventory items in that category.</p>
+
+  <!-- Dropdown list for classifications -->
+  <form id="classificationForm">
+    <label for="classification_id" class="sr-only">Choose a classification:</label>
+    <select id="classification_id" name="classification_id" required>
+      <%- classificationList %>
+    </select>
+  </form>
+
+  <!-- Table that will be filled dynamically by JavaScript -->
+  <table id="inventoryDisplay"></table>
+
+  <!-- Message for users with JavaScript disabled -->
+  <noscript>
+    <p><strong>JavaScript must be enabled to use this page.</strong></p>
+  </noscript>
+</main>
+
+<!-- Link to the external JavaScript file -->
+<script src="/js/inventory.js" defer></script>

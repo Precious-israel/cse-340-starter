@@ -903,3 +903,14 @@ h1 {
     color: #333;
     margin-bottom: 2rem;
 }
+
+/* the classification_list table*/
+#classificationForm {
+  margin: 1rem 0;
+}
+
+#classification_id {
+  width: 250px;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
