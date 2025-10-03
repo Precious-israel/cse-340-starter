@@ -30,9 +30,10 @@ router.post(
   utilities.handleErrors(accountController.accountLogin)
 );
 
-// ✅ Default account management view ("/account/")
+// ✅ Updated default account management view ("/account/")
 router.get(
   "/",
+  utilities.checkLogin, // <-- inserted here as instructed
   utilities.handleErrors(accountController.accountManagement)
 );
 
