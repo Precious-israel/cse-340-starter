@@ -1,48 +1,53 @@
 const express = require("express")
 const router = new express.Router()
-const invController = require("../controllers/invController")
-const utilities = require("../utilities") // Validation and utilities
+const invCont = require("../controllers/invController")
+const utilities = require("../utilities")
+const checkAccountType = require("../utilities/checkAccountType") // ✅ middleware
 
-// Wrap async controller methods for error handling
 const handleErrors = utilities.handleErrors
 
-// ----- Existing Routes -----
+// ===== Public Inventory Views ===== //
+router.get("/type/:classificationId", handleErrors(invCont.buildByClassificationId))
+router.get("/detail/:inv_id", handleErrors(invCont.buildByInventoryId))
+router.get("/", handleErrors(invCont.buildManagement))
 
-// Route to build inventory by classification view
-router.get("/type/:classificationId", handleErrors(invController.buildByClassificationId))
-
-// Route to display specific vehicle details
-router.get("/detail/:inv_id", handleErrors(invController.buildByInventoryId))
-
-// ----- Task 1: Inventory Management View -----
-router.get("/", handleErrors(invController.buildManagement))
-
-// ----- Task 2: Add Classification View -----
-router.get("/add-classification", handleErrors(invController.buildAddClassification))
-
-// Process Add Classification Form
+// ===== Admin / Employee Only: Add Classification ===== //
+router.get("/add-classification", checkAccountType, handleErrors(invCont.buildAddClassification))
 router.post(
   "/add-classification",
+  checkAccountType,
   utilities.classificationRules(),
   utilities.checkClassificationData,
-  handleErrors(invController.addClassification)
+  handleErrors(invCont.addClassification)
 )
 
-// ----- Task 3: Add Inventory View -----
-router.get("/add-inventory", handleErrors(invController.buildAddInventory))
-
-// Process Add Inventory Form
+// ===== Admin / Employee Only: Add Inventory ===== //
+router.get("/add-inventory", checkAccountType, handleErrors(invCont.buildAddInventory))
 router.post(
   "/add-inventory",
+  checkAccountType,
   utilities.vehicleRules(),
   utilities.checkVehicleData,
-  handleErrors(invController.addInventory)
+  handleErrors(invCont.addInventory)
 )
 
-// ===== ✅ NEW: Route to return inventory as JSON by classification ID =====
-router.get(
-  "/getInventory/:classification_id",
-  handleErrors(invController.getInventoryJSON)
+// ===== AJAX Inventory JSON Fetch (Public) ===== //
+router.get("/getInventory/:classification_id", handleErrors(invCont.getInventoryJSON))
+
+// ===== Admin / Employee Only: Edit Inventory ===== //
+router.get("/edit/:inv_id", checkAccountType, handleErrors(invCont.editInventoryView))
+
+// ===== Admin / Employee Only: Update Inventory ===== //
+router.post(
+  "/update",
+  checkAccountType,
+  utilities.vehicleRules(),
+  utilities.checkVehicleData,
+  handleErrors(invCont.updateInventory)
 )
+
+// ===== Admin / Employee Only: Delete Inventory ===== //
+router.get("/delete/:inv_id", checkAccountType, handleErrors(invCont.buildDeleteConfirm))
+router.post("/delete", checkAccountType, handleErrors(invCont.deleteInventoryItem))
 
 module.exports = router

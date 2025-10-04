@@ -13,5 +13,22 @@
     </ul>
   <% } %>
 
-  <p>You're logged in</p>
+  <% if (loggedin) { %>
+    <!-- Greeting -->
+    <h2>Welcome <%= account_firstname %></h2>
+
+    <!-- Update account link (always present) -->
+    <p>
+      <a href="/account/update/<%= account_id %>">Update Account Information</a>
+    </p>
+
+    <!-- Only for Employee or Admin -->
+    <% if (account_type === "Employee" || account_type === "Admin") { %>
+      <h3>Inventory Management</h3>
+      <p><a href="/inv/">Go to Inventory Management</a></p>
+    <% } %>
+
+  <% } else { %>
+    <p>Please <a href="/account/login">log in</a> to manage your account.</p>
+  <% } %>
 </main>

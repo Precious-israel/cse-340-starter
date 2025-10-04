@@ -7,14 +7,14 @@
     <li><a href="/inv">Sport</a></li>
     <li><a href="/inv">SUV</a></li>
     <li><a href="/inv">Truck</a></li>
-    
-   <% if (locals.loggedin) { %>
-  <li>Welcome, <%= locals.account_firstname %>!</li>
-  <li><a href="/account/">Account Management</a></li>
-  <li><a href="/account/logout">Logout</a></li>
-<% } else { %>
-  <li><a href="/account/login">My Account</a></li>
-<% } %>
 
+    <% if (loggedin) { %>
+      <!-- Visible when logged in -->
+      <li><a href="/account/">Welcome <%= account_firstname %></a></li>
+      <li><a href="/account/logout">Logout</a></li>
+    <% } else { %>
+      <!-- Visible when logged out -->
+      <li><a href="/account/login">My Account</a></li>
+    <% } %>
   </ul>
 </nav>

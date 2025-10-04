@@ -843,7 +843,6 @@ p a:hover {
 }
 
 
-
   /* Management Links Styles */
 .management-links {
     list-style: none;
@@ -914,3 +913,56 @@ h1 {
   padding: 0.5rem;
   font-size: 1rem;
 }
+/* account Form*/
+
+  .form-section {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  .btn {
+    padding: 0.7rem 1.2rem;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    background: #0056b3;
+  }
+
+  .password-rules {
+    background: #f9f9f9;
+    padding: 0.8rem;
+    border: 1px dashed #aaa;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .error-list {
+    color: red;
+    margin-bottom: 1rem;
+  }

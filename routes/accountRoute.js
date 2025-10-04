@@ -1,40 +1,60 @@
-// accountRoute.js
 const express = require("express");
 const router = express.Router();
 const accountController = require("../controllers/accountController");
 const utilities = require("../utilities/");
 const regValidate = require("../utilities/account-validation");
 
-// Login view route
+// Login view
 router.get("/login", utilities.handleErrors(accountController.buildLogin));
 
-// Logout route
+// Logout
 router.get("/logout", utilities.handleErrors(accountController.accountLogout));
 
-// Register view route
+// Register view
 router.get("/register", utilities.handleErrors(accountController.buildRegister));
 
-// Process the registration data
+// Process Registration
 router.post(
-  "/register",
-  regValidate.registrationRules(),
-  regValidate.checkRegData,
-  utilities.handleErrors(accountController.registerAccount)
+"/register",
+regValidate.registrationRules(),
+regValidate.checkRegData,
+utilities.handleErrors(accountController.registerAccount)
 );
 
-// Process the login request
+// Process Login
 router.post(
-  "/login",
-  regValidate.loginRules(),
-  regValidate.checkLoginData,
-  utilities.handleErrors(accountController.accountLogin)
+"/login",
+regValidate.loginRules(),
+regValidate.checkLoginData,
+utilities.handleErrors(accountController.accountLogin)
 );
 
-// ✅ Updated default account management view ("/account/")
+// Account Management View ("/account/")
+router.get("/", utilities.checkLogin, utilities.handleErrors(accountController.accountManagement));
+
+// Show Update Account Form (GET)
 router.get(
-  "/",
-  utilities.checkLogin, // <-- inserted here as instructed
-  utilities.handleErrors(accountController.accountManagement)
+"/update/:account_id",
+utilities.checkLogin,
+utilities.handleErrors(accountController.buildUpdateAccount)
+);
+
+// Process Account Update (POST)
+router.post(
+"/update/:account_id",
+utilities.checkLogin,
+regValidate.updateRules(),
+regValidate.checkUpdateData,
+utilities.handleErrors(accountController.updateAccount)
+);
+
+// Process Password Change (POST)
+router.post(
+"/update-password/:account_id",
+utilities.checkLogin,
+regValidate.passwordRules(),
+regValidate.checkPasswordData,
+utilities.handleErrors(accountController.updatePassword)
 );
 
 module.exports = router;

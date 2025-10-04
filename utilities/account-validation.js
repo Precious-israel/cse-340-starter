@@ -1,10 +1,9 @@
-const utilities = require(".")
 const { body, validationResult } = require("express-validator")
 const accountModel = require("../models/account-model")
 
-/*  **********************************
-  *  Registration Data Validation Rules
-  * ********************************* */
+/* **********************************
+ *  Registration Data Validation Rules
+ * ********************************* */
 function registrationRules() {
   return [
     body("account_firstname")
@@ -24,10 +23,11 @@ function registrationRules() {
       .isEmail()
       .normalizeEmail()
       .withMessage("A valid email is required.")
-      .custom(async (account_email) => {
-        const emailExists = await accountModel.checkExistingEmail(account_email)
-        if (emailExists) {
-          throw new Error("Email exists. Please log in or use a different email")
+      .custom(async (account_email, { req }) => {
+        // Only check if email changed
+        const existing = await accountModel.checkExistingEmail(account_email)
+        if (existing && account_email !== req.body.current_email) {
+          throw new Error("Email already in use. Use a different email.")
         }
       }),
 
@@ -41,25 +41,27 @@ function registrationRules() {
         minNumbers: 1,
         minSymbols: 1,
       })
-      .withMessage("Password does not meet requirements."),
+      .withMessage(
+        "Password must be at least 12 characters and include uppercase, lowercase, number, and symbol."
+      ),
   ]
 }
 
 /* ******************************
- * Check registration data and return errors or continue
+ * Check registration data
  * ***************************** */
 async function checkRegData(req, res, next) {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
-    console.log("Validation errors in checkRegData:", errors.array())
-    req.errors = errors // Attach errors to request object
+    req.flash("notice", errors.array().map((err) => err.msg).join("<br>"))
+    return res.redirect("/account/register")
   }
-  next() // Always call next() to continue to controller
+  next()
 }
 
-/*  **********************************
-  *  Login Data Validation Rules
-  * ********************************* */
+/* **********************************
+ *  Login Data Validation Rules
+ * ********************************* */
 function loginRules() {
   return [
     body("account_email")
@@ -76,20 +78,92 @@ function loginRules() {
 }
 
 /* ******************************
- * Check login data and return errors or continue
+ * Check login data
  * ***************************** */
 async function checkLoginData(req, res, next) {
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
-    console.log("Validation errors in checkLoginData:", errors.array())
-    req.errors = errors // Attach errors to request object
+    req.flash("notice", errors.array().map((err) => err.msg).join("<br>"))
+    return res.redirect("/account/login")
   }
-  next() // Always call next() to continue to controller
+  next()
+}
+
+/* **********************************
+ *  Update Account Validation Rules
+ * ********************************* */
+function updateRules() {
+  return [
+    body("account_firstname")
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage("Please provide a first name."),
+    body("account_lastname")
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage("Please provide a last name."),
+    body("account_email")
+      .trim()
+      .isEmail()
+      .normalizeEmail()
+      .withMessage("A valid email is required.")
+      .custom(async (account_email, { req }) => {
+        const existing = await accountModel.checkExistingEmail(account_email)
+        if (existing && account_email !== req.body.current_email) {
+          throw new Error("Email already exists.")
+        }
+      }),
+  ]
+}
+
+async function checkUpdateData(req, res, next) {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    req.flash("notice", errors.array().map((err) => err.msg).join("<br>"))
+    return res.redirect(`/account/update/${req.body.account_id}`)
+  }
+  next()
+}
+
+/* **********************************
+ *  Password Change Validation Rules
+ * ********************************* */
+function passwordRules() {
+  return [
+    body("account_password")
+      .trim()
+      .notEmpty()
+      .isStrongPassword({
+        minLength: 12,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+      })
+      .withMessage(
+        "Password must be at least 12 characters and include uppercase, lowercase, number, and symbol."
+      ),
+  ]
+}
+
+async function checkPasswordData(req, res, next) {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    req.flash("notice", errors.array().map((err) => err.msg).join("<br>"))
+    return res.redirect(`/account/update/${req.body.account_id}`)
+  }
+  next()
 }
 
 module.exports = {
   registrationRules,
   checkRegData,
   loginRules,
-  checkLoginData
+  checkLoginData,
+  updateRules,
+  checkUpdateData,
+  passwordRules,
+  checkPasswordData,
 }
