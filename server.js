@@ -11,9 +11,6 @@ const app = express();
 const pool = require("./database/");
 const utilities = require("./utilities/");
 
-// Import the JWT middleware correctly
-const { checkJWTToken } = require('./utilities/auth');
-
 // Routes and controllers
 const staticRoutes = require("./routes/static");
 const inventoryRoute = require("./routes/inventoryRoute");
@@ -21,9 +18,7 @@ const accountRoute = require("./routes/accountRoute");
 const errorRoute = require("./routes/errorRoute");
 const baseController = require("./controllers/baseController");
 
-// -------------------------
-// Middleware - IN CORRECT ORDER
-// -------------------------
+// -- Middleware - IN CORRECT ORDER --
 
 // ✅ 1. First: Parse incoming requests
 app.use(express.json());
@@ -57,23 +52,17 @@ app.use((req, res, next) => {
 });
 
 // ✅ 4. JWT Token Check Middleware - AFTER cookieParser
-app.use(checkJWTToken); // ← Use the imported function directly
+app.use(utilities.checkJWTToken); // ← This sets res.locals.loggedin, accountData, etc.
 
 // ✅ 5. Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// -------------------------
-// View Engine
-// -------------------------
-
+// -- View Engine --
 app.set("view engine", "ejs");
 app.use(expressLayouts);
 app.set("layout", "./layouts/layout");
 
-// -------------------------
-// Routes
-// -------------------------
-
+// -- Routes --
 app.get("/", utilities.handleErrors(baseController.buildHome));
 app.use("/inv", inventoryRoute);
 app.use("/account", accountRoute);
@@ -82,20 +71,14 @@ app.use("/account", accountRoute);
 app.use(staticRoutes);
 app.use("/", errorRoute);
 
-// -------------------------
-// 404 Not Found Handler
-// -------------------------
-
+// -- 404 Not Found Handler --
 app.use((req, res, next) => {
   const error = new Error("Sorry, we appear to have lost that page.");
   error.status = 404;
   next(error);
 });
 
-// -------------------------
-// Global Error Handler
-// -------------------------
-
+// -- Global Error Handler --
 app.use(async (err, req, res, next) => {
   const nav = await utilities.getNav();
   const status = err.status || 500;
@@ -114,10 +97,7 @@ app.use(async (err, req, res, next) => {
   });
 });
 
-// -------------------------
-// Start Server
-// -------------------------
-
+// -- Start Server --
 const port = process.env.PORT || 5500;
 const host = process.env.HOST || "localhost";
 

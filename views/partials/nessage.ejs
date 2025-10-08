@@ -1,0 +1,7 @@
+<% if (messages && messages.length > 0) { %>
+  <ul class="messages">
+    <% messages.forEach(function(msg) { %>
+      <li><%= msg %></li>
+    <% }); %>
+  </ul>
+<% } %>

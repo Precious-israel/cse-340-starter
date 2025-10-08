@@ -5,21 +5,19 @@ require("dotenv").config();
 
 const Util = {};
 
-/* ************************
+/* ****************************************
  * Constructs the nav HTML unordered list
- ************************** */
+ * *************************************** */
 Util.getNav = async function () {
   try {
     const data = await invModel.getClassifications();
     let list = "<ul>";
     list += '<li><a href="/" title="Home page">Home</a></li>';
-
     data.rows.forEach((row) => {
       list += "<li>";
       list += `<a href="/inv/type/${row.classification_id}" title="See our inventory of ${row.classification_name} vehicles">${row.classification_name}</a>`;
       list += "</li>";
     });
-
     list += "</ul>";
     return list;
   } catch (error) {
@@ -28,9 +26,9 @@ Util.getNav = async function () {
   }
 };
 
-/* ************************
+/* ****************************************
  * Build the classification grid for inventory listing
- ************************** */
+ * *************************************** */
 Util.buildClassificationGrid = async function (data) {
   let grid = "";
   if (data.length > 0) {
@@ -52,9 +50,9 @@ Util.buildClassificationGrid = async function (data) {
   return grid;
 };
 
-/* ************************
+/* ****************************************
  * Build the vehicle detail view
- ************************** */
+ * *************************************** */
 Util.buildVehicleDetail = function (vehicle) {
   const formatter = new Intl.NumberFormat("en-US");
   const price = formatter.format(vehicle.inv_price);
@@ -74,13 +72,12 @@ Util.buildVehicleDetail = function (vehicle) {
   `;
 };
 
-/* ************************
+/* ****************************************
  *  Build classification dropdown <option> list
- ************************** */
+ * *************************************** */
 Util.buildClassificationList = async function (selectedId = null) {
   const data = await invModel.getClassifications();
   let options = '<option value="">Choose a Classification</option>';
-
   data.rows.forEach((row) => {
     options += `<option value="${row.classification_id}"`;
     if (selectedId != null && row.classification_id == selectedId) {
@@ -88,13 +85,12 @@ Util.buildClassificationList = async function (selectedId = null) {
     }
     options += `>${row.classification_name}</option>`;
   });
-
   return options;
 };
 
-/* ************************
+/* ****************************************
  * Validation Rules & Middleware
- ************************** */
+ * *************************************** */
 
 // -- Classification Name Rules (no spaces or special chars)
 Util.classificationRules = () => {
@@ -112,10 +108,12 @@ Util.classificationRules = () => {
 Util.checkClassificationData = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    req.flash("message", errors.array().map((err) => err.msg).join("<br>"));
+    const nav = await Util.getNav();
+    req.flash("notice", errors.array().map((err) => err.msg).join("<br>"));
     return res.render("inventory/add-classification", {
       title: "Add New Classification",
-      message: req.flash("message"),
+      nav,
+      messages: req.flash(),
     });
   }
   next();
@@ -141,12 +139,14 @@ Util.vehicleRules = () => {
 Util.checkVehicleData = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    const nav = await Util.getNav();
     const classificationList = await Util.buildClassificationList(req.body.classification_id);
-    req.flash("message", errors.array().map((err) => err.msg).join("<br>"));
+    req.flash("notice", errors.array().map((err) => err.msg).join("<br>"));
     return res.render("inventory/add-inventory", {
       title: "Add New Inventory",
+      nav,
       classificationList,
-      message: req.flash("message"),
+      messages: req.flash(),
       inv_make: req.body.inv_make,
       inv_model: req.body.inv_model,
       inv_description: req.body.inv_description,
@@ -162,34 +162,41 @@ Util.checkVehicleData = async (req, res, next) => {
   next();
 };
 
-/* ************************
- * General Error Wrapper
- ************************** */
-Util.handleErrors = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
-
 /* ****************************************
- * Middleware to check token validity
- **************************************** */
+ * JWT Token Middleware
+ * *************************************** */
 Util.checkJWTToken = (req, res, next) => {
   if (req.cookies?.jwt) {
-    jwt.verify(req.cookies.jwt, process.env.ACCESS_TOKEN_SECRET, (err, accountData) => {
+    jwt.verify(req.cookies.jwt, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
       if (err) {
-        req.flash("Please log in");
-        res.clearCookie("jwt");
-        return res.redirect("/account/login");
+        // Token is invalid
+        res.locals.loggedin = 0;
+        res.locals.accountData = null;
+        res.locals.account_firstname = null;
+      } else {
+        // Token is valid
+        res.locals.loggedin = 1;
+        res.locals.accountData = decoded;
+        res.locals.account_firstname = decoded.account_firstname;
+        res.locals.account_type = decoded.account_type;
+        res.locals.account_id = decoded.account_id;
       }
-      res.locals.accountData = accountData;
-      res.locals.loggedin = 1;
       next();
     });
   } else {
+    // No token found
+    res.locals.loggedin = 0;
+    res.locals.accountData = null;
+    res.locals.account_firstname = null;
+    res.locals.account_type = null;
+    res.locals.account_id = null;
     next();
   }
 };
 
 /* ****************************************
- *  Check Login
- * ************************************ */
+ * Check Login Middleware (Basic login check)
+ * *************************************** */
 Util.checkLogin = (req, res, next) => {
   if (res.locals.loggedin) {
     next();
@@ -198,5 +205,27 @@ Util.checkLogin = (req, res, next) => {
     return res.redirect("/account/login");
   }
 };
+
+/* ****************************************
+ * Require Auth Middleware (Employee or Admin only)
+ * *************************************** */
+Util.requireAuth = (req, res, next) => {
+  if (res.locals.loggedin) {
+    if (res.locals.account_type === "Employee" || res.locals.account_type === "Admin") {
+      next();
+    } else {
+      req.flash("notice", "Access denied. Employees or Admins only.");
+      return res.redirect("/account/login");
+    }
+  } else {
+    req.flash("notice", "Please log in to access this area.");
+    return res.redirect("/account/login");
+  }
+};
+
+/* ****************************************
+ * General Error Wrapper
+ * *************************************** */
+Util.handleErrors = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
 module.exports = Util;

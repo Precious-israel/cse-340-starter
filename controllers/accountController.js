@@ -3,12 +3,11 @@ const utilities = require("../utilities/");
 const accountModel = require("../models/account-model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
 require("dotenv").config();
 
-/* *****************************
- * Show Login Page
- ***************************** */
+/* ****************************************
+ *  Show Login Page
+ * *************************************** */
 accountController.buildLogin = async function (req, res) {
   const nav = await utilities.getNav();
   res.render("account/login", {
@@ -18,9 +17,9 @@ accountController.buildLogin = async function (req, res) {
   });
 };
 
-/* *****************************
- * Show Registration Page
- ***************************** */
+/* ****************************************
+ *  Show Registration Page
+ * *************************************** */
 accountController.buildRegister = async function (req, res) {
   const nav = await utilities.getNav();
   res.render("account/register", {
@@ -30,9 +29,9 @@ accountController.buildRegister = async function (req, res) {
   });
 };
 
-/* *****************************
- * Process Registration
- ***************************** */
+/* ****************************************
+ *  Process Registration
+ * *************************************** */
 accountController.registerAccount = async function (req, res) {
   const nav = await utilities.getNav();
   const { account_firstname, account_lastname, account_email, account_password } = req.body;
@@ -50,7 +49,7 @@ accountController.registerAccount = async function (req, res) {
     }
 
     const emailExists = await accountModel.checkExistingEmail(account_email);
-    if (emailExists && emailExists.account_id) {
+    if (emailExists) {
       return res.status(400).render("account/register", {
         title: "Register",
         nav,
@@ -88,9 +87,9 @@ accountController.registerAccount = async function (req, res) {
   }
 };
 
-/* *****************************
- * Process Login
- ***************************** */
+/* ****************************************
+ *  Process Login
+ * *************************************** */
 accountController.accountLogin = async function (req, res) {
   const nav = await utilities.getNav();
   const { account_email, account_password } = req.body;
@@ -126,7 +125,6 @@ accountController.accountLogin = async function (req, res) {
     }
 
     delete accountData.account_password;
-
     const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "1h",
     });
@@ -136,8 +134,8 @@ accountController.accountLogin = async function (req, res) {
       secure: process.env.NODE_ENV === "production",
       maxAge: 3600 * 1000,
     };
-    res.cookie("jwt", accessToken, cookieOptions);
 
+    res.cookie("jwt", accessToken, cookieOptions);
     req.flash("notice", `Welcome back, ${accountData.account_firstname}!`);
     return res.redirect("/account/");
   } catch (error) {
@@ -151,9 +149,9 @@ accountController.accountLogin = async function (req, res) {
   }
 };
 
-/* *****************************
- * Process Logout
- ***************************** */
+/* ****************************************
+ *  Process Logout
+ * *************************************** */
 accountController.accountLogout = async function (req, res) {
   try {
     res.clearCookie("jwt");
@@ -165,14 +163,14 @@ accountController.accountLogout = async function (req, res) {
   }
 };
 
-/* *****************************
- * Show Account Management Page
- ***************************** */
+/* ****************************************
+ *  Show Account Management Page
+ * *************************************** */
 accountController.accountManagement = async function (req, res) {
   try {
     const nav = await utilities.getNav();
     const accountData = res.locals.accountData || {};
-
+    
     res.render("account/index", {
       title: "Account Management",
       nav,
@@ -188,9 +186,9 @@ accountController.accountManagement = async function (req, res) {
   }
 };
 
-/* *****************************
- * Show Update Account Page (GET)
- ***************************** */
+/* ****************************************
+ *  Show Update Account Page (GET)
+ * *************************************** */
 accountController.buildUpdateAccount = async function (req, res) {
   try {
     const account_id = parseInt(req.params.account_id, 10);
@@ -218,9 +216,9 @@ accountController.buildUpdateAccount = async function (req, res) {
   }
 };
 
-/* *****************************
- * Process Account Update (POST)
- ***************************** */
+/* ****************************************
+ *  Process Account Update (POST)
+ * *************************************** */
 accountController.updateAccount = async function (req, res) {
   try {
     const account_id = parseInt(req.params.account_id, 10);
@@ -231,15 +229,35 @@ accountController.updateAccount = async function (req, res) {
       return res.redirect("/account/");
     }
 
-    const updated = await accountModel.updateAccount(account_id, account_firstname, account_lastname, account_email);
+    // Check if validation errors exist
+    if (req.errors && req.errors.length) {
+      const nav = await utilities.getNav();
+      return res.status(400).render("account/update", {
+        title: "Update Account Information",
+        nav,
+        errors: req.errors,
+        account: { account_id, account_firstname, account_lastname, account_email }
+      });
+    }
+
+    const updated = await accountModel.updateAccount(
+      account_id,
+      account_firstname,
+      account_lastname,
+      account_email
+    );
+
     if (!updated) {
       req.flash("error", "Account update failed.");
       return res.redirect(`/account/update/${account_id}`);
     }
 
+    // Get fresh account data and update JWT
     const fresh = await accountModel.getAccountById(account_id);
-    delete fresh.account_password;
-    const newToken = jwt.sign(fresh, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+    const newToken = jwt.sign(fresh, process.env.ACCESS_TOKEN_SECRET, { 
+      expiresIn: "1h" 
+    });
+
     res.cookie("jwt", newToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -255,9 +273,9 @@ accountController.updateAccount = async function (req, res) {
   }
 };
 
-/* *****************************
- * Process Password Change (POST)
- ***************************** */
+/* ****************************************
+ *  Process Password Change (POST)
+ * *************************************** */
 accountController.updatePassword = async function (req, res) {
   try {
     const account_id = parseInt(req.params.account_id, 10);
@@ -268,6 +286,18 @@ accountController.updatePassword = async function (req, res) {
       return res.redirect("/account/");
     }
 
+    // Check if validation errors exist
+    if (req.errors && req.errors.length) {
+      const nav = await utilities.getNav();
+      const accountData = await accountModel.getAccountById(account_id);
+      return res.status(400).render("account/update", {
+        title: "Update Account Information",
+        nav,
+        errors: req.errors,
+        account: accountData
+      });
+    }
+
     const hashed = await bcrypt.hash(account_password, 10);
     const updated = await accountModel.updatePassword(account_id, hashed);
 
@@ -275,15 +305,6 @@ accountController.updatePassword = async function (req, res) {
       req.flash("error", "Password update failed.");
       return res.redirect(`/account/update/${account_id}`);
     }
-
-    const fresh = await accountModel.getAccountById(account_id);
-    delete fresh.account_password;
-    const newToken = jwt.sign(fresh, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
-    res.cookie("jwt", newToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 3600 * 1000,
-    });
 
     req.flash("success", "Password changed successfully.");
     return res.redirect("/account/");

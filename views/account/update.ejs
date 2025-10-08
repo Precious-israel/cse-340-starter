@@ -1,20 +1,321 @@
-<%- include("../partials/header") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %> | CSE 340 App</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .form-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .form-section {
+      margin-bottom: 3rem;
+      padding: 2rem;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .form-section h2 {
+      color: #333;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #007BFF;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      border-color: #007BFF;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    
+    .btn:hover {
+      background: #0056b3;
+    }
+    
+    .btn-back {
+      background: #6c757d;
+      text-decoration: none;
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      color: white;
+      border-radius: 4px;
+      margin-top: 1rem;
+    }
+    
+    .btn-back:hover {
+      background: #545b62;
+    }
+    
+    .password-rules {
+      background: #e8f4ff;
+      border: 1px solid #b3d9ff;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    
+    .password-rules ul {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+    
+    .password-rules li {
+      margin-bottom: 0.25rem;
+    }
+    
+    .error-list {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+    
+    .checkbox-group label {
+      margin-bottom: 0;
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+  <div id="wrapper">
+    
+    <main>
+      <div class="form-container">
+        <h1><%= title %></h1>
 
-<main>
-  <h1>Update Account</h1>
+        <!-- Flash Messages -->
+        <% if (messages().notice && messages().notice.length > 0) { %>
+          <div class="success-message">
+            <% messages().notice.forEach(msg => { %>
+              <p><%= msg %></p>
+            <% }) %>
+          </div>
+        <% } %>
 
-  <form method="post" action="/account/update/<%= account.account_id %>">
-    <label for="firstname">First Name</label>
-    <input type="text" id="firstname" name="account_firstname" value="<%= account.account_firstname %>" required>
+        <!-- Validation Errors -->
+        <% if (errors && errors.length > 0) { %>
+          <ul class="error-list">
+            <% errors.forEach(error => { %>
+              <li><%= error.msg %></li>
+            <% }) %>
+          </ul>
+        <% } %>
 
-    <label for="lastname">Last Name</label>
-    <input type="text" id="lastname" name="account_lastname" value="<%= account.account_lastname %>" required>
+        <!-- Account Update Form -->
+        <div class="form-section">
+          <h2>Update Account Information</h2>
+          <form method="post" action="/account/update/<%= account.account_id %>" novalidate>
+            <div class="form-group">
+              <label for="account_firstname">First Name:</label>
+              <input 
+                type="text" 
+                id="account_firstname" 
+                name="account_firstname" 
+                value="<%= account.account_firstname %>" 
+                required
+                pattern="^[a-zA-Z\s]{1,30}$"
+                title="First name must contain only letters and spaces, maximum 30 characters"
+              >
+            </div>
 
-    <label for="email">Email</label>
-    <input type="email" id="email" name="account_email" value="<%= account.account_email %>" required>
+            <div class="form-group">
+              <label for="account_lastname">Last Name:</label>
+              <input 
+                type="text" 
+                id="account_lastname" 
+                name="account_lastname" 
+                value="<%= account.account_lastname %>" 
+                required
+                pattern="^[a-zA-Z\s]{1,30}$"
+                title="Last name must contain only letters and spaces, maximum 30 characters"
+              >
+            </div>
 
-    <button type="submit">Update</button>
-  </form>
-</main>
+            <div class="form-group">
+              <label for="account_email">Email:</label>
+              <input 
+                type="email" 
+                id="account_email" 
+                name="account_email" 
+                value="<%= account.account_email %>" 
+                required
+                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                title="Please enter a valid email address"
+              >
+            </div>
 
-<%- include("../partials/footer") %>
+            <input type="hidden" name="account_id" value="<%= account.account_id %>">
+            <input type="hidden" name="current_email" value="<%= account.account_email %>">
+            
+            <button type="submit" class="btn">Update Account Information</button>
+          </form>
+        </div>
+
+        <!-- Password Change Form -->
+        <div class="form-section">
+          <h2>Change Password</h2>
+          <form method="post" action="/account/update-password/<%= account.account_id %>" novalidate>
+            <div class="form-group">
+              <label for="account_password">New Password:</label>
+              <input 
+                type="password" 
+                id="account_password" 
+                name="account_password" 
+                required
+                pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+                title="Password must be at least 12 characters and include uppercase, lowercase, number, and symbol."
+                oninput="validatePassword()"
+              >
+            </div>
+
+            <div class="password-rules">
+              <p><strong>Password Requirements:</strong></p>
+              <ul>
+                <li>At least 12 characters long</li>
+                <li>Include at least 1 uppercase letter (A-Z)</li>
+                <li>Include at least 1 lowercase letter (a-z)</li>
+                <li>Include at least 1 number (0-9)</li>
+                <li>Include at least 1 special character (!@#$%^&* etc.)</li>
+                <li>No spaces allowed</li>
+              </ul>
+              <p id="passwordFeedback" class="feedback"></p>
+            </div>
+
+            <div class="checkbox-group">
+              <input type="checkbox" id="showPassword" onclick="togglePassword()">
+              <label for="showPassword">Show Password</label>
+            </div>
+
+            <input type="hidden" name="account_id" value="<%= account.account_id %>">
+            
+            <button type="submit" class="btn">Change Password</button>
+          </form>
+        </div>
+
+        <a href="/account/" class="btn-back">← Back to Account Management</a>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    function togglePassword() {
+      const passwordField = document.getElementById('account_password');
+      const showPasswordCheckbox = document.getElementById('showPassword');
+      
+      if (showPasswordCheckbox.checked) {
+        passwordField.type = 'text';
+      } else {
+        passwordField.type = 'password';
+      }
+    }
+
+    function validatePassword() {
+      const passwordField = document.getElementById('account_password');
+      const feedback = document.getElementById('passwordFeedback');
+      const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$/;
+      
+      if (passwordField.value === '') {
+        feedback.textContent = '';
+        feedback.style.color = '';
+        return;
+      }
+      
+      if (!regex.test(passwordField.value)) {
+        feedback.textContent = 'Password does not meet all requirements.';
+        feedback.style.color = '#dc3545';
+      } else {
+        feedback.textContent = 'Password meets all requirements!';
+        feedback.style.color = '#28a745';
+      }
+    }
+
+    // Real-time validation for account fields
+    document.addEventListener('DOMContentLoaded', function() {
+      const firstNameField = document.getElementById('account_firstname');
+      const lastNameField = document.getElementById('account_lastname');
+      const emailField = document.getElementById('account_email');
+      
+      function validateField(field, pattern) {
+        field.addEventListener('input', function() {
+          if (field.value === '') {
+            field.style.borderColor = '#ced4da';
+          } else if (pattern.test(field.value)) {
+            field.style.borderColor = '#28a745';
+          } else {
+            field.style.borderColor = '#dc3545';
+          }
+        });
+      }
+      
+      validateField(firstNameField, /^[a-zA-Z\s]{1,30}$/);
+      validateField(lastNameField, /^[a-zA-Z\s]{1,30}$/);
+      validateField(emailField, /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+    });
+  </script>
+</body>
+</html>

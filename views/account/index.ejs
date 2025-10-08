@@ -2,7 +2,13 @@
   <h1>Account Management</h1>
 
   <!-- Flash messages -->
-  <%- messages() %>
+  <% if (messages().notice && messages().notice.length > 0) { %>
+    <div class="success-message">
+      <% messages().notice.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
 
   <!-- Errors if any -->
   <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
@@ -14,21 +20,91 @@
   <% } %>
 
   <% if (loggedin) { %>
-    <!-- Greeting -->
+    <!-- Greeting for ALL account types -->
     <h2>Welcome <%= account_firstname %></h2>
 
-    <!-- Update account link (always present) -->
-    <p>
-      <a href="/account/update/<%= account_id %>">Update Account Information</a>
-    </p>
+    <!-- Update account link (always present for all account types) -->
+    <div class="management-actions">
+      <a href="/account/update/<%= account_id %>" class="btn btn-primary">
+        Update Account Information
+      </a>
+    </div>
 
     <!-- Only for Employee or Admin -->
     <% if (account_type === "Employee" || account_type === "Admin") { %>
-      <h3>Inventory Management</h3>
-      <p><a href="/inv/">Go to Inventory Management</a></p>
+      <div class="inventory-management">
+        <h3>Inventory Management</h3>
+        <p>
+          <a href="/inv/" class="btn btn-secondary">Go to Inventory Management</a>
+        </p>
+      </div>
     <% } %>
 
   <% } else { %>
-    <p>Please <a href="/account/login">log in</a> to manage your account.</p>
+    <div class="login-prompt">
+      <p>Please <a href="/account/login">log in</a> to manage your account.</p>
+    </div>
   <% } %>
 </main>
+
+<style>
+  .management-actions {
+    margin: 2rem 0;
+  }
+  
+  .inventory-management {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #007BFF;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+  }
+  
+  .btn:hover {
+    background: #0056b3;
+  }
+  
+  .btn-secondary {
+    background: #6c757d;
+  }
+  
+  .btn-secondary:hover {
+    background: #545b62;
+  }
+  
+  .success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .error-list {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border: 1px solid #f5c6cb;
+  }
+  
+  .login-prompt {
+    text-align: center;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+</style>
