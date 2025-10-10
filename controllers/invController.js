@@ -325,4 +325,43 @@ invCont.deleteInventoryItem = async function (req, res, next) {
   }
 }
 
+// Add this to your existing invController
+const reviewModel = require("../models/review-model");
+
+// ... existing code ...
+
+/* ****************************************
+ *  Build Vehicle Detail View
+ * *************************************** */
+invCont.buildByInventoryId = async function (req, res, next) {
+  try {
+    const inv_id = parseInt(req.params.inv_id);
+    const nav = await utilities.getNav();
+    const vehicleData = await invModel.getInventoryById(inv_id);
+    
+    if (!vehicleData) {
+      const error = new Error("Vehicle not found.");
+      error.status = 404;
+      throw error;
+    }
+
+    // Get reviews for this vehicle
+    const reviews = await reviewModel.getReviewsByInventoryId(inv_id);
+    
+    const vehicleHtml = utilities.buildVehicleDetail(vehicleData);
+    
+    res.render("inventory/detail", {
+      title: `${vehicleData.inv_make} ${vehicleData.inv_model}`,
+      nav,
+      vehicleHtml,
+      vehicle: vehicleData,
+      reviews,
+      loggedin: res.locals.loggedin,
+      accountData: res.locals.accountData
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = invCont;

@@ -1,0 +1,194 @@
+
+  <style>
+    .edit-review-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .review-vehicle-info {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      border-left: 4px solid #007BFF;
+    }
+    
+    .review-form {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    
+    .readonly-field {
+      background: #e9ecef;
+      border: 1px solid #ced4da;
+      padding: 0.75rem;
+      border-radius: 4px;
+      color: #6c757d;
+      width: 100%;
+    }
+    
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 1rem;
+      resize: vertical;
+      min-height: 150px;
+    }
+    
+    .char-count {
+      color: #6c757d;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: #007bff;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #545b62;
+    }
+    
+    .error-list {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      border: 1px solid #f5c6cb;
+      list-style: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="wrapper">
+    <main>
+      <div class="edit-review-container">
+        <h1><%= title %></h1>
+
+        <!-- Flash messages -->
+        <% if (messages().notice && messages().notice.length > 0) { %>
+          <div class="success-message">
+            <% messages().notice.forEach(msg => { %>
+              <p><%= msg %></p>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <!-- Vehicle Information -->
+        <div class="review-vehicle-info">
+          <h3>Vehicle: <%= review.inv_year %> <%= review.inv_make %> <%= review.inv_model %></h3>
+          <p>Original review date: <%= new Date(review.review_date).toLocaleDateString() %></p>
+        </div>
+
+        <!-- Edit Review Form -->
+        <form action="/review/update/<%= review.review_id %>" method="post" class="review-form">
+          <div class="form-group">
+            <label for="screen_name">Screen Name:</label>
+            <input 
+              type="text" 
+              id="screen_name" 
+              value="<%= review.account_firstname.charAt(0) %>. <%= review.account_lastname %>" 
+              readonly 
+              class="readonly-field"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="review_text">Your Review:</label>
+            <textarea 
+              id="review_text" 
+              name="review_text" 
+              required 
+              maxlength="1000"
+              placeholder="Share your thoughts about this vehicle..."
+            ><%= review.review_text %></textarea>
+            <div class="char-count">
+              <span id="charCount"><%= review.review_text.length %></span> / 1000 characters
+            </div>
+          </div>
+
+          <!-- Validation Errors -->
+          <% if (errors && errors.length > 0) { %>
+            <div class="error-list">
+              <ul>
+                <% errors.forEach(error => { %>
+                  <li><%= error.msg %></li>
+                <% }) %>
+              </ul>
+            </div>
+          <% } %>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Update Review</button>
+            <a href="/account/" class="btn btn-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Character count for review text
+    const reviewText = document.getElementById('review_text');
+    const charCount = document.getElementById('charCount');
+    
+    if (reviewText && charCount) {
+      reviewText.addEventListener('input', function() {
+        charCount.textContent = this.value.length;
+        
+        // Add warning color when approaching limit
+        if (this.value.length > 900) {
+          charCount.style.color = '#dc3545';
+        } else if (this.value.length > 800) {
+          charCount.style.color = '#ffc107';
+        } else {
+          charCount.style.color = '#6c757d';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

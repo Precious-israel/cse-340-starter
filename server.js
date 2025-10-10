@@ -6,7 +6,7 @@ const flash = require("connect-flash");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const app = express();
-
+const reviewRoute = require("./routes/reviewRoute");
 // Database and utilities
 const pool = require("./database/");
 const utilities = require("./utilities/");
@@ -66,6 +66,8 @@ app.set("layout", "./layouts/layout");
 app.get("/", utilities.handleErrors(baseController.buildHome));
 app.use("/inv", inventoryRoute);
 app.use("/account", accountRoute);
+// Add to your existing routes
+app.use("/review", reviewRoute);
 
 // Static and error routes
 app.use(staticRoutes);

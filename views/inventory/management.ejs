@@ -7,32 +7,49 @@
   </section>
 
   <!-- Navigation links for management actions -->
-  <ul class="management-links">
-    <li><a href="/inv/add-classification">Add New Classification</a></li>
-    <li><a href="/inv/add-inventory">Add New Inventory</a></li>
-  </ul>
+  <div class="management-actions">
+    <a href="/inv/add-classification" class="btn btn-primary">
+      <i class="fas fa-folder-plus"></i> Add New Classification
+    </a>
+    <a href="/inv/add-inventory" class="btn btn-primary">
+      <i class="fas fa-car"></i> Add New Vehicle
+    </a>
+  </div>
 
-  <!-- New content: Heading, paragraph, select list, table, noscript -->
-  <h2>Manage Inventory</h2>
+  <!-- Inventory management section -->
+  <div class="inventory-section">
+    <h2>Manage Inventory</h2>
+    <p>Select a classification from the list to view and manage inventory items.</p>
 
-  <p>Select a classification from the list to see the inventory items in that category.</p>
+    <!-- Dropdown list for classifications -->
+    <div class="classification-filter">
+      <form id="classificationForm">
+        <label for="classification_id" class="filter-label">Choose a classification:</label>
+        <select id="classification_id" name="classification_id" required>
+          <%- classificationList %>
+        </select>
+      </form>
+    </div>
 
-  <!-- Dropdown list for classifications -->
-  <form id="classificationForm">
-    <label for="classification_id" class="sr-only">Choose a classification:</label>
-    <select id="classification_id" name="classification_id" required>
-      <%- classificationList %>
-    </select>
-  </form>
+    <!-- Table that will be filled dynamically by JavaScript -->
+    <div id="inventoryDisplay">
+      <div class="no-data">
+        <i class="fas fa-car"></i>
+        <h3>No Classification Selected</h3>
+        <p>Please select a classification from the dropdown above to view inventory items.</p>
+      </div>
+    </div>
 
-  <!-- Table that will be filled dynamically by JavaScript -->
-  <table id="inventoryDisplay"></table>
-
-  <!-- Message for users with JavaScript disabled -->
-  <noscript>
-    <p><strong>JavaScript must be enabled to use this page.</strong></p>
-  </noscript>
+    <!-- Pagination controls -->
+    <div id="paginationControls"></div>
+  </div>
 </main>
+
+<!-- Link to the external CSS file -->
+<link rel="stylesheet" href="/css/inventory-management.css">
 
 <!-- Link to the external JavaScript file -->
 <script src="/js/inventory.js" defer></script>
+
+<!-- Font Awesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>

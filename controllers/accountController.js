@@ -4,6 +4,7 @@ const accountModel = require("../models/account-model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const reviewModel = require("../models/review-model");
 
 /* ****************************************
  *  Show Login Page
@@ -312,6 +313,37 @@ accountController.updatePassword = async function (req, res) {
     console.error("updatePassword error:", err);
     req.flash("error", "An unexpected error occurred while updating password.");
     return res.redirect("back");
+  }
+};
+
+
+
+
+/* ****************************************
+ *  Show Account Management Page
+ * *************************************** */
+accountController.accountManagement = async function (req, res) {
+  try {
+    const nav = await utilities.getNav();
+    const accountData = res.locals.accountData || {};
+    
+    // Get user's reviews
+    const userReviews = accountData.account_id ? 
+      await reviewModel.getReviewsByAccountId(accountData.account_id) : [];
+    
+    res.render("account/index", {
+      title: "Account Management",
+      nav,
+      errors: [],
+      account_firstname: accountData.account_firstname,
+      account_type: accountData.account_type,
+      account_id: accountData.account_id,
+      loggedin: !!accountData.account_id,
+      reviews: userReviews
+    });
+  } catch (err) {
+    console.error("accountManagement error:", err);
+    throw err;
   }
 };
 

@@ -228,4 +228,28 @@ Util.requireAuth = (req, res, next) => {
  * *************************************** */
 Util.handleErrors = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
+
+// Add to your existing validation rules
+
+// -- Review Validation Rules
+Util.reviewRules = () => {
+  return [
+    body("review_text")
+      .trim()
+      .notEmpty()
+      .withMessage("Review text is required.")
+      .isLength({ max: 1000 })
+      .withMessage("Review must be less than 1000 characters."),
+  ];
+};
+
+// -- Review Form Validation Handler
+Util.checkReviewData = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.errors = errors.array();
+  }
+  next();
+};
+
 module.exports = Util;
